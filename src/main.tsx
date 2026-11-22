@@ -9,13 +9,12 @@ import { sameButBackground, ViewBackground } from '#/lib/background.ts'
 import { cardKey } from '#/lib/lastRoom.ts'
 import { closest, closestClass, inPanelView } from '#/lib/panelView.ts'
 import WithSidePanel from '#/tiles/WithSidePanel.tsx'
+import { SIDE_PANEL } from '#/tiles/sidePanel.ts'
 import pickerPicture from '#/assets/picker.jpg?inline'
 import type { BackgroundConfig, CardConfig, TileChoice, TileChoices } from '#/types.ts'
 
-const CARD_TYPE = 'diorama-card'
+const CARD_TYPE = 'diorama-holo-card'
 const EDITOR_TYPE = `${CARD_TYPE}-editor`
-// The name the card had before it was renamed.
-const OLD_TYPE = 'floorplan-3d'
 
 // Kinds that were renamed or folded into another one. A plan written
 // before the change still names the old one, and without this the piece
@@ -134,8 +133,8 @@ function migrate(config: CardConfig): CardConfig {
       })
   }
   if (Array.isArray(config.devices)) next.devices = config.devices.filter(d => known.has(d.room))
-  // The names the card and its tiles had before they were renamed.
-  if (config.type === `custom:${OLD_TYPE}`) next.type = `custom:${CARD_TYPE}`
+  // The tiles of a plan copied from Diorama, or written before its tiles
+  // were renamed, are this card's own.
   if (rooms.some(r => r.tiles)) next.rooms = rooms.map(r => (r.tiles ? { ...r, tiles: renameTiles(r.tiles) } : r))
   if (config.home?.tiles) next.home = { ...config.home, tiles: renameTiles(config.home.tiles) }
   return next
@@ -143,7 +142,7 @@ function migrate(config: CardConfig): CardConfig {
 
 function renameTiles(tiles: TileChoices): TileChoices {
   const rename = (tile: TileChoice) =>
-    typeof tile.type === 'string' ? { ...tile, type: tile.type.replace(/^custom:fp-/, 'custom:dio-') } : tile
+    typeof tile.type === 'string' ? { ...tile, type: tile.type.replace(/^custom:(fp|dio)-/, 'custom:holo-') } : tile
   return Object.fromEntries(
     Object.entries(tiles).map(([id, tile]) => [id, Array.isArray(tile) ? tile.map(rename) : rename(tile)]),
   )
@@ -233,7 +232,7 @@ class DioramaCard extends ReactHost<CardConfig> {
     super.render()
     if (this.picked) return
     // The copy of the card in the side panel leaves it to the card around it.
-    if (this._config && !closest(this, 'dio-side-panel')) this.background.apply(this.backdrop, this._hass)
+    if (this._config && !closest(this, SIDE_PANEL)) this.background.apply(this.backdrop, this._hass)
   }
 
   // In the "add card" picker the card stands for itself with a picture of
@@ -274,7 +273,7 @@ class DioramaCard extends ReactHost<CardConfig> {
     this.key = null
     if (this.previewed) this.take('preview')
     else if (!this.picked && this._config) {
-      const key = `${closest(this, 'dio-side-panel') ? 'panel' : 'card'}|${cardKey(this._config)}`
+      const key = `${closest(this, SIDE_PANEL) ? 'panel' : 'card'}|${cardKey(this._config)}`
       this.key = key
       // The old card may only leave once the new one is in, so a new card
       // with nothing to take yet waits a tick before building its own.
@@ -407,18 +406,13 @@ class DioramaEditor extends ReactHost<CardConfig> {
 // Says which version is loaded, the way most custom cards do, so a stale
 // card.js in the browser's cache is easy to spot.
 console.info(
-  `%c DIORAMA %c v${__CARD_VERSION__} `,
+  `%c DIORAMA HOLO %c v${__CARD_VERSION__} `,
   'color: white; background: #3f5f7a; font-weight: bold; border-radius: 4px 0 0 4px',
   'color: #3f5f7a; background: #e6eef5; font-weight: bold; border-radius: 0 4px 4px 0',
 )
 
 if (!customElements.get(CARD_TYPE)) customElements.define(CARD_TYPE, DioramaCard)
 if (!customElements.get(EDITOR_TYPE)) customElements.define(EDITOR_TYPE, DioramaEditor)
-// The names the card had before it was renamed, so a dashboard written then
-// still finds it. They are left out of the card picker.
-if (!customElements.get(OLD_TYPE)) customElements.define(OLD_TYPE, class extends DioramaCard {})
-if (!customElements.get(`${OLD_TYPE}-editor`))
-  customElements.define(`${OLD_TYPE}-editor`, class extends DioramaEditor {})
 
 // Makes the card show up in the "add card" picker.
 // Loaded twice, once as a module and once by a resource of an older
@@ -427,7 +421,7 @@ window.customCards = window.customCards ?? []
 if (!window.customCards.some(card => card.type === CARD_TYPE))
   window.customCards.push({
     type: CARD_TYPE,
-    name: 'Diorama',
+    name: 'Diorama Holo',
     description: 'Your home as a 3D model, with your devices in it',
     preview: true,
   })

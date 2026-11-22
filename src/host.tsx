@@ -4,8 +4,8 @@ import type { HomeAssistant } from '#/types.ts'
 import { StrictMode, type ReactNode } from 'react'
 import { createRoot, type Root } from 'react-dom/client'
 
-const FONTS_ID = 'diorama-fonts'
-const PROPERTIES_ID = 'diorama-properties'
+const FONTS_ID = 'diorama-holo-fonts'
+const PROPERTIES_ID = 'diorama-holo-properties'
 
 // Fonts must live in the document, not the shadow root, for @font-face to apply.
 function injectFonts() {

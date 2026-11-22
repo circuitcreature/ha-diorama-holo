@@ -60,7 +60,7 @@ export function choices(hass: HomeAssistant, auto: AutoCard, chosen: TileChoice 
   const options = tileOptions(hass, entityId)
   const autoKey = setupKey(auto)
   if (!options.some(option => setupKey(option.config) === autoKey))
-    options.unshift({ name: auto.type.replace(/^custom:dio-/, ''), config: auto })
+    options.unshift({ name: auto.type.replace(/^custom:holo-/, ''), config: auto })
   return { options, auto: autoKey, current: chosen ? setupKey(chosen) : autoKey }
 }
 
@@ -102,7 +102,12 @@ export function TilePicker({
   const shown = showing(hass, String(auto.entity))
   const labels = labelsOf(picked[editing])
   return (
-    <div role="group" aria-label="Widgets" className="grid grid-cols-12 items-start px-1.5 pt-1.5" style={{ gap: `18px ${GAP_PX}px` }}>
+    <div
+      role="group"
+      aria-label="Widgets"
+      className="grid grid-cols-12 items-start px-1.5 pt-1.5"
+      style={{ gap: `18px ${GAP_PX}px` }}
+    >
       {options.map(option => {
         const key = setupKey(option.config)
         const at = keys.indexOf(key)

@@ -56,7 +56,7 @@ export type GridOptions = {
   fixed?: boolean
 }
 
-const FONTS_ID = 'dio-tiles-fonts'
+const FONTS_ID = 'holo-tiles-fonts'
 const FONTS_URL =
   'https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300..700&family=Inter+Tight:wght@500..800&display=swap'
 
@@ -138,7 +138,7 @@ export abstract class TileHost<C extends TileConfig> extends ReactHost<C> {
   constructor() {
     super()
     injectFonts()
-    injectProperties(tilesCss, 'diorama-tiles-properties')
+    injectProperties(tilesCss, 'diorama-holo-tiles-properties')
     addStyles(this.shadowRoot!, tilesCss)
   }
 

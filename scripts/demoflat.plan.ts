@@ -443,7 +443,7 @@ device('media_player.study_speaker', 'study_speaker')
 device('fan.kids_fan', 'kids_fan')
 
 export const DEMO_FLAT: CardConfig = {
-  type: 'custom:diorama-card',
+  type: 'custom:diorama-holo-card',
   side_panel: true,
   // A click on a piece in another room flies to that room first.
   first_click: 'room',

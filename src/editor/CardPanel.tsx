@@ -5,11 +5,11 @@ import { setDevSettings, useDevSettings } from '#/lib/devSettings.ts'
 import { setPreviewRoom } from '#/lib/previewRoom.ts'
 import { screenName, thisScreen, withScreen } from '#/lib/screen.ts'
 import { cn } from '#/lib/utils.ts'
-import { field, group, groupTitle, note } from '#/editor/look.ts'
+import { colorWell, field, group, groupTitle, note } from '#/editor/look.ts'
 import ControlsGuide from '#/editor/ControlsGuide.tsx'
 import { ResetButton, Slider, Switch } from '#/editor/panel.tsx'
 import { SUN_DIRECTION_DEG } from '#/constants.ts'
-import { EDITOR_TINT_COLOR } from '#/theme.ts'
+import { BLUEPRINT_COLOR, EDITOR_TINT_COLOR } from '#/theme.ts'
 import { entityName } from '#/devices/catalog.ts'
 import type {
   BackgroundConfig,
@@ -111,6 +111,19 @@ export default function CardPanel({ hass, config, onChange, opening, onOpen }: P
   const setRoomsFirst = (on: boolean) => {
     const { first_click: _, ...rest } = config
     onChange(on ? { ...rest, first_click: 'room' } : rest)
+  }
+
+  // The blueprint style and its line color, the color left out at its default.
+  const blueprint = config.style === 'blueprint'
+  const setBlueprint = (on: boolean) => {
+    const { style: _, style_color: __, ...rest } = config
+    onChange(
+      on ? { ...rest, style: 'blueprint', ...(config.style_color && { style_color: config.style_color }) } : rest,
+    )
+  }
+  const setBlueprintColor = (color: string) => {
+    const { style_color: _, ...rest } = config
+    onChange(color === BLUEPRINT_COLOR ? rest : { ...rest, style_color: color })
   }
 
   // Which way the sun comes from, left out of the YAML at its default.
@@ -619,6 +632,36 @@ export default function CardPanel({ hass, config, onChange, opening, onOpen }: P
           <FollowSection hass={hass} config={config} onChange={onChange} roomName={room => roomName(hass, room)} />
         </Section>
       )}
+
+      <Section title="Style">
+        <div className={cn(group, 'gap-0 py-0')}>
+          <label className="flex cursor-pointer items-center justify-between gap-4 py-2.5">
+            <span className="flex min-w-0 flex-col">
+              <span className="text-[13px]">Blueprint</span>
+              <span className="text-label-2 text-xs">The home drawn as glowing lines over dark glass.</span>
+            </span>
+            <Switch checked={blueprint} accent={EDITOR_TINT_COLOR} label="Blueprint" onChange={setBlueprint} />
+          </label>
+          {blueprint && (
+            <label className="border-separator flex cursor-pointer items-center justify-between gap-4 border-t py-2.5">
+              <span className="text-[13px]">Line color</span>
+              <span className="flex items-center gap-2">
+                <input
+                  type="color"
+                  className={colorWell}
+                  value={config.style_color ?? BLUEPRINT_COLOR}
+                  onChange={e => setBlueprintColor(e.target.value)}
+                />
+                <ResetButton
+                  label="Line color"
+                  changed={config.style_color !== undefined}
+                  onReset={() => setBlueprintColor(BLUEPRINT_COLOR)}
+                />
+              </span>
+            </label>
+          )}
+        </div>
+      </Section>
 
       <Section title="Background">
         <div className={cn(group, 'gap-0 py-0')}>

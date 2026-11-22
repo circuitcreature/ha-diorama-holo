@@ -15,19 +15,19 @@ export type RoomFilter = {
   floor?: FloorFilter
 } | null
 
-export const ROOM_FILTER_EVENT = 'dio-room-filter'
+export const ROOM_FILTER_EVENT = 'holo-room-filter'
 
 declare global {
   interface Window {
-    __fpRoomFilter?: RoomFilter
+    __holoRoomFilter?: RoomFilter
   }
   interface WindowEventMap {
-    'dio-room-filter': CustomEvent<RoomFilter>
+    'holo-room-filter': CustomEvent<RoomFilter>
   }
 }
 
 export function roomFilter(): RoomFilter {
-  return window.__fpRoomFilter ?? null
+  return window.__holoRoomFilter ?? null
 }
 
 export function setRoomFilter(filter: RoomFilter) {
@@ -39,7 +39,7 @@ export function setRoomFilter(filter: RoomFilter) {
     JSON.stringify(now?.floor ?? null) === JSON.stringify(filter?.floor ?? null)
   )
     return
-  window.__fpRoomFilter = filter
+  window.__holoRoomFilter = filter
   window.dispatchEvent(new CustomEvent(ROOM_FILTER_EVENT, { detail: filter }))
 }
 

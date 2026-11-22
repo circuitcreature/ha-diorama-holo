@@ -15,7 +15,7 @@ export type DevSettings = {
   touchPerformance: boolean
 }
 
-const KEY = 'diorama-dev'
+const KEY = 'diorama-holo-dev'
 const NONE: DevSettings = { open: false, fps: false, touchPerformance: true }
 
 function load(): DevSettings {

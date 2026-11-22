@@ -5,7 +5,7 @@ views:
     type: panel
     theme: Diorama Glass
     cards:
-      - type: custom:diorama-card
+      - type: custom:diorama-holo-card
         side_panel: true
         first_click: room
         home:

@@ -130,7 +130,7 @@ The tile shows pause or start, stop, and back to the dock, each only when the va
 `dio-media-remote` is `dio-media-control` with the remote under it, always the whole width. While off it is two rows with only its icon, name and state, and a double tap turns it on. It grows to four rows at once, without waiting for the player, its buttons fade in and what plays comes in behind them: the title in place of the name, back, home and power in the top right, power turning it off on a second press, and the buttons that play over the volume, left of the pad. It finds the remote of the same device like `dio-remote`, and takes `commands`, `volume_entity` and `power_entity` the same way for a player whose remote is elsewhere, like a universal player. Play and pause go as the remote's play key when it has one, or the `play` command, since some apps cast to a box ignore a pause sent to the player. On a phone, where the name has no room beside the volume, the buttons that play and the volume stand at the top on the left with the name under them. Turned on from the card, it scrolls into view once it has grown.
 
 ```yaml
-type: custom:dio-remote
+type: custom:holo-remote
 entity: remote.living_room
 volume_entity: media_player.living_room_tv
 commands:
@@ -171,7 +171,7 @@ Entities with no piece on the plan, like a scene, a sensor, a thermostat or a me
 Dragging a tile moves it, the others sliding out of its way, and the panel shows the room's tiles in that order. With a tile focused, the arrow keys move it too. In YAML the order is the room's `order`, a list of entity ids. An entity it leaves out goes after the ones it names.
 
 ```yaml
-type: custom:diorama-card
+type: custom:diorama-holo-card
 side_panel: true
 rooms:
   - id: living
@@ -190,7 +190,7 @@ rooms:
 Some tiles are for the whole home rather than a room, like a scene that sets up the bedroom for the projector, a switch that turns every light off, or the weather. Put them under the Home heading at the top of the Edit widgets page. It takes any entity, shows the same tiles as the rooms, and they are moved, resized and taken out the same way. Its heading reads Home and can be typed over to rename it. With any entity there, the panel shows only this section while the whole home is in view, and each room's tiles only while that room is. With none, every room shows as before. To keep every room's tiles under the home's with the whole home in view, turn on **Show all widgets on the home view** in the settings. A room in view still shows only its own. In YAML it is the card's `home`, with an optional `name`, its `entities` in the order they show, and `show_rooms: true` for that switch.
 
 ```yaml
-type: custom:diorama-card
+type: custom:diorama-holo-card
 side_panel: true
 home:
   name: Home
@@ -215,14 +215,14 @@ home:
     - light.living_room
   tiles:
     light.living_room:
-      type: custom:dio-dial
+      type: custom:holo-dial
 rooms:
   - id: living
     name: Living room
     points: [[0, 0], [5, 0], [5, 4], [0, 4]]
     tiles:
       light.floor_lamp:
-        type: custom:dio-toggle
+        type: custom:holo-toggle
         feature: color-favorites
 ```
 
@@ -234,7 +234,7 @@ home:
     - script.script_downstairs_lights_dining
   tiles:
     script.script_downstairs_lights_dining:
-      type: custom:dio-button
+      type: custom:holo-button
       name: Dining
       icon: ph:fork-knife
 ```

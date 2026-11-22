@@ -23,7 +23,9 @@
 // the room where someone was last detected, with buttons along the bottom
 // to move them from room to room.
 // `vacuum=1` has the robot vacuum say which room it cleans, with buttons
-// along the bottom to send it to a room or back to its dock. The living
+// along the bottom to send it to a room or back to its dock.
+// `blueprint` draws the home in the blueprint style, and `blueprint=00e5ff`
+// in lines of that color. The living
 // room is named by an alias of its area, Sala, as a robot's app would.
 // A click on a piece flips its entity, the way Home Assistant would. A cover
 // sent to a position runs there at a tenth of its travel every half second.
@@ -87,6 +89,11 @@ if (mobile) {
 const frame = params.get('frame')
 if (frame) config.frame_rooms = frame.split(',')
 if (params.get('first') === 'device') config.first_click = 'device'
+if (params.has('blueprint')) {
+  config.style = 'blueprint'
+  const color = params.get('blueprint')
+  if (color) config.style_color = `#${color}`
+}
 if (params.has('all')) config.all_floors = true
 if (params.has('three')) {
   // A second floor that is a copy of the first, to see three floors at once.
@@ -99,7 +106,9 @@ if (params.has('three')) {
   ]
   config.decorations = [
     ...(config.decorations ?? []),
-    ...(config.decorations ?? []).filter(item => upstairs.has(item.room)).map(item => ({ ...copy(item), room: `${item.room}_2` })),
+    ...(config.decorations ?? [])
+      .filter(item => upstairs.has(item.room))
+      .map(item => ({ ...copy(item), room: `${item.room}_2` })),
   ]
 }
 if (params.has('single')) {
@@ -140,7 +149,9 @@ const living = config.rooms?.find(room => room.id === 'living')?.area_id
 if (vacuum && living) areas[living].aliases = ['Sala']
 
 type CardElement = HTMLElement & { setConfig: (c: CardConfig) => void; hass: HomeAssistant }
-const element = document.createElement(params.has('editor') ? 'diorama-card-editor' : 'diorama-card') as CardElement
+const element = document.createElement(
+  params.has('editor') ? 'diorama-holo-card-editor' : 'diorama-holo-card',
+) as CardElement
 const hass = (): HomeAssistant => ({
   states: structuredClone(states),
   areas,

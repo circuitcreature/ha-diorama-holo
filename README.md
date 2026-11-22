@@ -1,8 +1,8 @@
 <img src="docs/images/icon.svg" width="128" alt="A lit opal globe table lamp in a wooden cradle, the Diorama icon">
 
-# Diorama
+# Diorama Holo
 
-A Home Assistant card that turns your home into a small 3D model you can click.
+A Home Assistant card that turns your home into a small 3D model you can click. It is a fork of [Diorama](https://github.com/CarlesRojas/ha-diorama) with a Blueprint style that draws the home as glowing lines over dark glass, and it installs beside the original without clashing: its card is `custom:diorama-holo-card` and its tiles are `custom:holo-*`.
 
 ## The diorama
 
@@ -29,7 +29,7 @@ Everything is built inside Home Assistant, in the card's own full-screen editor.
 Diorama needs Home Assistant 2024.6 or newer.
 
 1. In Home Assistant open **HACS**, open the three-dot menu in the top right and choose **Custom repositories**.
-2. Paste `https://github.com/CarlesRojas/ha-diorama`, pick the **Dashboard** type and add it.
+2. Paste `https://github.com/circuitcreature/ha-diorama-holo`, pick the **Dashboard** type and add it.
 3. Search for **Diorama** in HACS and download it. HACS registers the card's resource for you.
 4. Reload the browser.
 5. Edit a dashboard, choose **Add card** and search for **Diorama**.
@@ -39,8 +39,8 @@ Updates arrive through HACS like any other card. If a new version does not show 
 <details>
 <summary>Install by hand, without HACS</summary>
 
-1. Download `card.js` from the [latest release](https://github.com/CarlesRojas/ha-diorama/releases/latest) into `config/www/diorama/card.js`.
-2. In **Settings > Dashboards**, open the three-dot menu, choose **Resources** and add `/local/diorama/card.js` as a **JavaScript module**.
+1. Download `card.js` from the [latest release](https://github.com/circuitcreature/ha-diorama-holo/releases/latest) into `config/www/diorama-holo/card.js`.
+2. In **Settings > Dashboards**, open the three-dot menu, choose **Resources** and add `/local/diorama-holo/card.js` as a **JavaScript module**.
 3. Edit a dashboard, choose **Add card** and search for **Diorama**.
 
 When you update, bump a `?v=` query on the resource URL so browsers pick up the new file.

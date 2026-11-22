@@ -4,7 +4,7 @@ import type { CardConfig } from '#/types.ts'
 // again opens on the same room. It does that when the app comes back from
 // the background and draws the dashboard anew. Kept for the browser tab, so
 // it lasts through a reload of the page too, and starts empty in a new tab.
-const KEY = 'diorama-room'
+const KEY = 'diorama-holo-room'
 
 // Kept here as well, for when the browser keeps nothing.
 let rooms: Record<string, string> = {}
@@ -36,7 +36,7 @@ export function keepRoom(card: string, room: string | null) {
 
 // The floor each card with floors was showing, kept the same way, so a card
 // built again opens on that floor even with no room in view.
-const FLOOR_KEY = 'diorama-floor'
+const FLOOR_KEY = 'diorama-holo-floor'
 
 let floors: Record<string, string> = {}
 try {

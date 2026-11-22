@@ -5,7 +5,7 @@
 //
 //   http://localhost:5173/src/dev/cards.html
 //
-// light=1 shows the light dashboard, and card=dio-dial one kind of card.
+// light=1 shows the light dashboard, and card=holo-dial one kind of card.
 import { registerTiles } from '#/tiles/index.tsx'
 import type { EntityState, HomeAssistant } from '#/types.ts'
 
@@ -739,16 +739,16 @@ const dedupe = () =>
 // two sections the way a dashboard does, for the README.
 const SHOWCASE: Record<string, unknown>[][] = [
   [
-    { type: 'dio-title', title: 'Living Room' },
-    { type: 'custom:dio-dial', entity: 'climate.living', grid_options: { rows: 5 } },
-    { type: 'custom:dio-toggle', entity: 'light.living_room', feature: 'brightness', size: 'wide' },
+    { type: 'holo-title', title: 'Living Room' },
+    { type: 'custom:holo-dial', entity: 'climate.living', grid_options: { rows: 5 } },
+    { type: 'custom:holo-toggle', entity: 'light.living_room', feature: 'brightness', size: 'wide' },
   ],
   [
-    { type: 'dio-title', title: 'Home' },
-    { type: 'custom:dio-weather', entity: 'weather.home', forecast_type: 'hourly', grid_options: { rows: 3 } },
-    { type: 'custom:dio-lock', entity: 'lock.front', feature: 'open-door' },
-    { type: 'custom:dio-toggle', entity: 'light.all' },
-    { type: 'custom:dio-vacuum', entity: 'vacuum.robot', size: 'wide' },
+    { type: 'holo-title', title: 'Home' },
+    { type: 'custom:holo-weather', entity: 'weather.home', forecast_type: 'hourly', grid_options: { rows: 3 } },
+    { type: 'custom:holo-lock', entity: 'lock.front', feature: 'open-door' },
+    { type: 'custom:holo-toggle', entity: 'light.all' },
+    { type: 'custom:holo-vacuum', entity: 'vacuum.robot', size: 'wide' },
   ],
 ]
 if (params.get('showcase')) {
@@ -758,7 +758,11 @@ if (params.get('showcase')) {
   thermostat.state = 'cool'
   Object.assign(thermostat.attributes, { hvac_action: 'cooling', current_temperature: 25.5, temperature: 23 })
   // A light group with most of the flat's lights on.
-  for (const [id, name] of [['light.kitchen', 'Kitchen'], ['light.hall', 'Hall'], ['light.bedroom', 'Bedroom']])
+  for (const [id, name] of [
+    ['light.kitchen', 'Kitchen'],
+    ['light.hall', 'Hall'],
+    ['light.bedroom', 'Bedroom'],
+  ])
     states[id] = state(id, 'on', { friendly_name: name, brightness: 200, supported_color_modes: ['brightness'] })
   states['light.all'] = state('light.all', 'on', {
     friendly_name: 'All Lights',

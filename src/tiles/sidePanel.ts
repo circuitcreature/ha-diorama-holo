@@ -16,8 +16,8 @@ type CardConfig = {
 // rather than letting it grow to fit.
 const setHeight = (element: HTMLElement) => !!closestClass(element, 'fit-rows')
 
-const PLAN_TYPE = 'custom:diorama-card'
-export const SIDE_PANEL = 'dio-side-panel'
+const PLAN_TYPE = 'custom:diorama-holo-card'
+export const SIDE_PANEL = 'holo-side-panel'
 
 // Below this width the panel goes under the diorama, which then takes the
 // whole width.

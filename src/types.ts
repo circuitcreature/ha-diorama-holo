@@ -300,6 +300,11 @@ export type CardConfig = {
   // follows the ones it does, in the plan's order.
   room_order?: string[]
   background?: BackgroundConfig
+  // How the home is drawn. `blueprint` traces every edge in `style_color`
+  // over faces filled with a deep shade of it. Solid, as built, when absent.
+  style?: 'blueprint'
+  // The line color of the blueprint style, as a hex string.
+  style_color?: string
   // Sizes of the side panel's layout for each screen it is seen on, by the
   // id the screen gave itself. Set from the card's settings on that screen.
   screens?: Record<string, ScreenConfig>

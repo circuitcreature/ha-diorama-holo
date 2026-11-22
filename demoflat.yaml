@@ -1,4 +1,4 @@
-type: custom:diorama-card
+type: custom:diorama-holo-card
 grid_options:
   columns: full
 side_panel: true

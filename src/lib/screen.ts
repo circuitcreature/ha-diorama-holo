@@ -5,7 +5,7 @@ import type { CardConfig, ScreenConfig } from '#/types.ts'
 // is known by an id it is given the first time and keeps in its own storage,
 // so it stays the same across dashboards and reloads, and differs from every
 // other screen.
-const KEY = 'diorama-screen'
+const KEY = 'diorama-holo-screen'
 
 let id: string | null = null
 

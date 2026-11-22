@@ -219,101 +219,101 @@ type Suggestion = { label?: string; name?: string; config: Record<string, unknow
 
 const CARDS: Card[] = [
   {
-    type: 'dio-title',
+    type: 'holo-title',
     element: TitleCard,
     domains: null,
-    name: 'Diorama Room Title',
+    name: 'Diorama Holo Room Title',
     description: 'Section heading that follows the room filter',
   },
   {
-    type: 'dio-toggle',
+    type: 'holo-toggle',
     element: entityCard(TOGGLE_DOMAINS, Toggle, ['confirm']),
     domains: TOGGLE_DOMAINS,
-    name: 'Diorama Toggle',
+    name: 'Diorama Holo Toggle',
     twice: true,
     twiceOnly: ['media_player'],
     description: 'Light, switch, fan, valve or anything else on or off',
   },
   {
-    type: 'dio-button',
+    type: 'holo-button',
     element: entityCard(BUTTON_DOMAINS, Button, ['confirm']),
     domains: BUTTON_DOMAINS,
-    name: 'Diorama Button',
+    name: 'Diorama Holo Button',
     repeats: ['button'],
     twice: true,
     description: 'Button, script or scene widget',
   },
   {
-    type: 'dio-cover',
+    type: 'holo-cover',
     element: entityCard<CoverConfig>(COVER_DOMAINS, Cover, ['invert'], true),
     wide: true,
     domains: COVER_DOMAINS,
-    name: 'Diorama Cover',
+    name: 'Diorama Holo Cover',
     repeats: ['open-close'],
     controls: 'Buttons',
     description: 'Blind or screen widget with up, stop and down',
   },
   {
-    type: 'dio-vacuum',
+    type: 'holo-vacuum',
     element: entityCard<VacuumConfig>(VACUUM_DOMAINS, Vacuum, ['battery_entity'], true),
     wide: true,
     domains: VACUUM_DOMAINS,
-    name: 'Diorama Vacuum',
+    name: 'Diorama Holo Vacuum',
     repeats: ['commands'],
     controls: 'Buttons',
     description: 'Robot vacuum widget',
   },
   {
-    type: 'dio-select',
+    type: 'holo-select',
     element: entityCard<SelectConfig>(SELECT_DOMAINS, Select, ['tap_behavior']),
     domains: SELECT_DOMAINS,
-    name: 'Diorama Option List',
+    name: 'Diorama Holo Option List',
     repeats: ['select-options'],
     description: 'Option widget with a menu',
   },
   {
-    type: 'dio-climate',
+    type: 'holo-climate',
     element: entityCard(CLIMATE_DOMAINS, Climate, [], true),
     wide: true,
     domains: CLIMATE_DOMAINS,
-    name: 'Diorama Thermostat',
+    name: 'Diorama Holo Thermostat',
     controls: 'Temperature and Modes',
     description: 'Thermostat or water heater widget with its temperature and modes',
   },
   {
-    type: 'dio-media',
+    type: 'holo-media',
     element: entityCard(MEDIA_DOMAINS, Media, [], true),
     wide: true,
     domains: MEDIA_DOMAINS,
-    name: 'Diorama Media Player',
+    name: 'Diorama Holo Media Player',
     repeats: ['playback'],
     controls: 'Buttons',
     description: 'Speaker or TV widget with play, pause and tracks',
   },
   {
-    type: 'dio-lock',
+    type: 'holo-lock',
     element: entityCard(LOCK_DOMAINS, Lock),
-    name: 'Diorama Lock',
+    name: 'Diorama Holo Lock',
     description: 'Lock widget',
     domains: LOCK_DOMAINS,
   },
   {
-    type: 'dio-entity',
+    type: 'holo-entity',
     element: entityCard('any', Entity),
     domains: 'any',
-    name: 'Diorama Any Entity',
+    name: 'Diorama Holo Any Entity',
     description: 'Any entity, like a sensor, with its state',
   },
   {
-    type: 'dio-weather',
+    type: 'holo-weather',
     element: WeatherCard,
     domains: WEATHER_DOMAINS,
-    name: 'Diorama Weather',
+    name: 'Diorama Holo Weather',
     description: 'The weather now and the next hours',
     variants: ['Hourly Weather', 'Daily Weather', 'Small Weather', 'Large Weather'],
     suggest: (hass, entityId) => {
       const features = Number(hass.states[entityId]?.attributes.supported_features ?? 0)
-      const config = { type: 'custom:dio-weather', entity: entityId }
+      const config = { type: 'custom:holo-weather', entity: entityId }
       const small = { label: 'Small', name: 'Small Weather', config: { ...config, size: 'small' } }
       // A large tile lists the days, under the hours when there are any.
       const sized =
@@ -330,22 +330,22 @@ const CARDS: Card[] = [
     },
   },
   {
-    type: 'dio-camera',
+    type: 'holo-camera',
     element: CameraCard,
-    name: 'Diorama Camera',
+    name: 'Diorama Holo Camera',
     description: 'Camera or image picture widget',
     domains: CAMERA_DOMAINS,
   },
   {
-    type: 'dio-alarm-panel',
+    type: 'holo-alarm-panel',
     element: panelCard(['alarm_control_panel'], AlarmPanel, { columns: 'full', rows: 5 }, 5),
     extra: true,
     domains: ['alarm_control_panel'],
-    name: 'Diorama Alarm Keypad',
+    name: 'Diorama Holo Alarm Keypad',
     description: 'The alarm with a button for each mode and a keypad for its code',
   },
   {
-    type: 'dio-dial',
+    type: 'holo-dial',
     element: panelCard<TileConfig>(
       DIAL_DOMAINS,
       Dial,
@@ -356,17 +356,17 @@ const CARDS: Card[] = [
     ),
     extra: true,
     domains: DIAL_DOMAINS,
-    name: 'Diorama Big Dial',
+    name: 'Diorama Holo Big Dial',
     description: 'A thermostat, water heater, humidifier or light on a big ring you drag',
     suggest: (hass, entityId) => {
       const entity = hass.states[entityId]
       const domain = entityId.split('.')[0]
       if (domain === 'light' && !featuresFor(entity).some(feature => feature.id === 'brightness')) return null
-      return [{ config: { type: 'custom:dio-dial', entity: entityId } }]
+      return [{ config: { type: 'custom:holo-dial', entity: entityId } }]
     },
   },
   {
-    type: 'dio-media-control',
+    type: 'holo-media-control',
     element: panelCard<MediaControlConfig>(
       MEDIA_DOMAINS,
       MediaControl,
@@ -381,7 +381,7 @@ const CARDS: Card[] = [
     ),
     extra: true,
     domains: MEDIA_DOMAINS,
-    name: 'Diorama Now Playing',
+    name: 'Diorama Holo Now Playing',
     description: 'What is playing, with its art, how far in it is, its buttons and volume',
     variants: ['Now Playing with Art as Icon'],
     // Only for a player that plays, pauses, skips or changes its volume,
@@ -390,16 +390,16 @@ const CARDS: Card[] = [
       !supports(hass.states[entityId], PLAYS)
         ? []
         : [
-            { config: { type: 'custom:dio-media-control', entity: entityId } },
+            { config: { type: 'custom:holo-media-control', entity: entityId } },
             {
               label: 'Art as Icon',
               name: 'Now Playing with Art as Icon',
-              config: { type: 'custom:dio-media-control', entity: entityId, art: 'icon' },
+              config: { type: 'custom:holo-media-control', entity: entityId, art: 'icon' },
             },
           ],
   },
   {
-    type: 'dio-media-remote',
+    type: 'holo-media-remote',
     element: panelCard<MediaControlConfig>(
       MEDIA_DOMAINS,
       MediaRemote,
@@ -411,58 +411,58 @@ const CARDS: Card[] = [
     ),
     extra: true,
     domains: MEDIA_DOMAINS,
-    name: 'Diorama Media and Remote',
+    name: 'Diorama Holo Media and Remote',
     description: 'What is playing and its buttons, with the remote under them while it is on',
     // Only for a player that plays and whose remote keys it knows.
     suggest: (hass, entityId) =>
       supports(hass.states[entityId], PLAYS) && keysOf(hass, entityId)
-        ? [{ config: { type: 'custom:dio-media-remote', entity: entityId } }]
+        ? [{ config: { type: 'custom:holo-media-remote', entity: entityId } }]
         : [],
   },
   {
-    type: 'dio-remote',
+    type: 'holo-remote',
     element: RemoteCard,
     extra: true,
     domains: ['remote', 'media_player'],
-    name: 'Diorama TV Remote',
+    name: 'Diorama Holo TV Remote',
     description: 'Arrows, OK, back, home, mute and volume for a TV or a streaming box',
     // Only for a TV or a box whose keys it knows, by its own integration or
     // another on the same device.
     suggest: (hass, entityId) =>
-      keysOf(hass, entityId) ? [{ config: { type: 'custom:dio-remote', entity: entityId } }] : [],
+      keysOf(hass, entityId) ? [{ config: { type: 'custom:holo-remote', entity: entityId } }] : [],
   },
   {
-    type: 'dio-calendar',
+    type: 'holo-calendar',
     element: panelCard<CalendarConfig>(['calendar'], Calendar, { columns: 'full', rows: 6 }, 6, ['calendar']),
     extra: true,
     domains: ['calendar'],
-    name: 'Diorama Calendar',
+    name: 'Diorama Holo Calendar',
     description: 'The coming events of one calendar or more, day by day',
     variants: ["Today's Calendar"],
     suggest: (_, entityId) => [
-      { config: { type: 'custom:dio-calendar', entity: entityId } },
-      { label: 'Today', name: "Today's Calendar", config: { type: 'custom:dio-calendar', entity: entityId, days: 1 } },
+      { config: { type: 'custom:holo-calendar', entity: entityId } },
+      { label: 'Today', name: "Today's Calendar", config: { type: 'custom:holo-calendar', entity: entityId, days: 1 } },
     ],
   },
   {
-    type: 'dio-todo',
+    type: 'holo-todo',
     element: panelCard(['todo'], Todo, { columns: 'full', rows: 'auto' }, 5),
     extra: true,
     domains: ['todo'],
-    name: 'Diorama To-do List',
+    name: 'Diorama Holo To-do List',
     description: 'A list to add to and tick off',
   },
   {
-    type: 'dio-graph',
+    type: 'holo-graph',
     element: panelCard<GraphConfig>(GRAPH_DOMAINS, Graph, { columns: 12, rows: 4 }, 4, ['graph']),
     extra: true,
     domains: GRAPH_DOMAINS,
-    name: 'Diorama History Graph',
+    name: 'Diorama Holo History Graph',
     description: 'The history of a reading, or the times something was on',
     variants: ['Daily Bar Graph'],
     suggest: (hass, entityId) => {
       const entity = hass.states[entityId]
-      const config = { type: 'custom:dio-graph', entity: entityId }
+      const config = { type: 'custom:holo-graph', entity: entityId }
       const numeric = isNumeric(entity)
       const daily = numeric && typeof entity?.attributes.state_class === 'string'
       return [
@@ -473,26 +473,26 @@ const CARDS: Card[] = [
     },
   },
   {
-    type: 'dio-gauge',
+    type: 'holo-gauge',
     element: panelCard<GaugeConfig>(GAUGE_DOMAINS, Gauge, { columns: 6, rows: 2 }, 2, ['gauge']),
     extra: true,
     domains: GAUGE_DOMAINS,
-    name: 'Diorama Ring Gauge',
+    name: 'Diorama Holo Ring Gauge',
     description: 'A reading on a ring',
     suggest: (hass, entityId) =>
-      isNumeric(hass.states[entityId]) ? [{ config: { type: 'custom:dio-gauge', entity: entityId } }] : null,
+      isNumeric(hass.states[entityId]) ? [{ config: { type: 'custom:holo-gauge', entity: entityId } }] : null,
   },
   {
-    type: 'dio-map',
+    type: 'holo-map',
     element: panelCard<MapConfig>(MAP_DOMAINS, MapCard, { columns: 12, rows: 4 }, 4, ['map']),
     extra: true,
     domains: MAP_DOMAINS,
-    name: 'Diorama Map',
+    name: 'Diorama Holo Map',
     description: 'Where a person, a tracker or a zone is',
     variants: ['Map on Top'],
     suggest: (_, entityId) => [
-      { config: { type: 'custom:dio-map', entity: entityId } },
-      { label: 'On Top', name: 'Map on Top', config: { type: 'custom:dio-map', entity: entityId, layout: 'top' } },
+      { config: { type: 'custom:holo-map', entity: entityId } },
+      { label: 'On Top', name: 'Map on Top', config: { type: 'custom:holo-map', entity: entityId, layout: 'top' } },
     ],
   },
 ]
@@ -502,10 +502,6 @@ export function registerTiles() {
   window.customCards = window.customCards ?? []
   for (const card of CARDS) {
     if (!customElements.get(card.type)) customElements.define(card.type, card.element)
-    // The name the tile had before the card was renamed, so a dashboard
-    // written then still finds it. It is left out of the card picker.
-    const old = card.type.replace(/^dio-/, 'fp-')
-    if (!customElements.get(old)) customElements.define(old, class extends card.element {})
     if (!window.customCards.some(c => c.type === card.type))
       window.customCards.push({
         type: card.type,
@@ -565,7 +561,7 @@ function registerVariant(card: Card, name: string) {
       }
     },
   )
-  window.customCards!.push({ type, name: `Diorama ${name}`, description: card.description, preview: true })
+  window.customCards!.push({ type, name: `Diorama Holo ${name}`, description: card.description, preview: true })
 }
 
 // The suggestions of a card for an entity picked in Home Assistant's card
@@ -606,7 +602,7 @@ function suggestions(card: Card, hass: HomeAssistant, entityId: string): Suggest
 }
 
 // A card's name without ours before it, as in Toggle.
-const shortName = (card: Card) => card.name.replace(/^Diorama (Any )?/, '')
+const shortName = (card: Card) => card.name.replace(/^Diorama Holo (Any )?/, '')
 
 // Domains whose state alone says nothing, like a calendar's on or off, so
 // Diorama Entity is never offered for them.

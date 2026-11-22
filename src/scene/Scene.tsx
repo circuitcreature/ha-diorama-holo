@@ -9,7 +9,8 @@ import {
   OPENING_FADE_MS,
 } from '#/constants.ts'
 import { cn } from '#/lib/utils.ts'
-import { ROOM_CORNER_RADIUS_M, ROOM_GAP_M } from '#/theme.ts'
+import { BLUEPRINT_COLOR, ROOM_CORNER_RADIUS_M, ROOM_GAP_M } from '#/theme.ts'
+import Blueprint from '#/scene/Blueprint.tsx'
 import Adaptive from '#/scene/Adaptive.tsx'
 import Bvh from '#/scene/bvh.tsx'
 import CameraRig, { type CameraHandle } from '#/scene/CameraRig.tsx'
@@ -218,6 +219,7 @@ export default function Scene({
           tone mapped, softly darkened at the corners, and in the editor with
           the picked thing outlined. */}
         <Effects selected={selected} focus={focus} edgeFade={edgeFade} />
+        {config.style === 'blueprint' && <Blueprint color={config.style_color ?? BLUEPRINT_COLOR} />}
         {rooms.map((room, i) => (
           <Room
             key={room.id}

@@ -63,7 +63,7 @@ for (const kind of DECORATION_KINDS) {
 }
 
 const yaml = [
-  'type: custom:diorama-card',
+  'type: custom:diorama-holo-card',
   'grid_options:',
   '  columns: full',
   'rooms:',

@@ -9,38 +9,38 @@ export type AutoCard = { type: string; [key: string]: unknown }
 export type AutoGroup = { room: string | null; cards: AutoCard[] }
 
 const TILE_TYPES: Record<string, string> = {
-  light: 'dio-toggle',
-  switch: 'dio-toggle',
-  input_boolean: 'dio-toggle',
-  fan: 'dio-toggle',
-  humidifier: 'dio-toggle',
-  siren: 'dio-toggle',
-  remote: 'dio-toggle',
-  automation: 'dio-toggle',
-  valve: 'dio-toggle',
-  climate: 'dio-climate',
-  water_heater: 'dio-climate',
-  media_player: 'dio-media',
-  lock: 'dio-lock',
-  cover: 'dio-cover',
-  vacuum: 'dio-vacuum',
-  camera: 'dio-camera',
-  button: 'dio-button',
-  input_button: 'dio-button',
-  script: 'dio-button',
-  scene: 'dio-button',
-  select: 'dio-select',
-  input_select: 'dio-select',
-  weather: 'dio-weather',
-  calendar: 'dio-calendar',
-  todo: 'dio-todo',
+  light: 'holo-toggle',
+  switch: 'holo-toggle',
+  input_boolean: 'holo-toggle',
+  fan: 'holo-toggle',
+  humidifier: 'holo-toggle',
+  siren: 'holo-toggle',
+  remote: 'holo-toggle',
+  automation: 'holo-toggle',
+  valve: 'holo-toggle',
+  climate: 'holo-climate',
+  water_heater: 'holo-climate',
+  media_player: 'holo-media',
+  lock: 'holo-lock',
+  cover: 'holo-cover',
+  vacuum: 'holo-vacuum',
+  camera: 'holo-camera',
+  button: 'holo-button',
+  input_button: 'holo-button',
+  script: 'holo-button',
+  scene: 'holo-button',
+  select: 'holo-select',
+  input_select: 'holo-select',
+  weather: 'holo-weather',
+  calendar: 'holo-calendar',
+  todo: 'holo-todo',
 }
 
 // Anything else, a sensor, a person or the weather, shows its state.
-const FALLBACK = 'dio-entity'
+const FALLBACK = 'holo-entity'
 
 // Tiles with buttons of their own are wide, so the buttons show.
-const WIDE = new Set(['dio-cover', 'dio-vacuum', 'dio-climate', 'dio-media'])
+const WIDE = new Set(['holo-cover', 'holo-vacuum', 'holo-climate', 'holo-media'])
 
 // The icon for the piece a device stands behind, where it says more than
 // the device's domain would.
@@ -137,7 +137,7 @@ export function roomEntities(plan: CardConfig, room: RoomConfig) {
 }
 
 function heading(room: RoomConfig): AutoCard {
-  const card: AutoCard = { type: 'custom:dio-title', never_hide: true }
+  const card: AutoCard = { type: 'custom:holo-title', never_hide: true }
   if (room.name) card.title = room.name
   else if (room.area_id) card.area = room.area_id
   else card.title = room.id
@@ -234,12 +234,12 @@ export function panelWidgets(plan: CardConfig, room: RoomConfig | null): PanelWi
 // the remote, so it is given the entities of those cards.
 function sparePower(cards: AutoCard[]): AutoCard[] {
   const beside = cards
-    .filter(card => ['custom:dio-toggle', 'custom:dio-media-control', 'custom:dio-media-remote'].includes(card.type))
+    .filter(card => ['custom:holo-toggle', 'custom:holo-media-control', 'custom:holo-media-remote'].includes(card.type))
     .map(card => card.entity)
     .filter(entity => typeof entity === 'string')
   if (!beside.length) return cards
   return cards.map(card =>
-    card.type === 'custom:dio-remote' && card.power === undefined ? { ...card, power_beside: beside } : card,
+    card.type === 'custom:holo-remote' && card.power === undefined ? { ...card, power_beside: beside } : card,
   )
 }
 
@@ -247,7 +247,7 @@ export function autoGroups(plan: CardConfig): AutoGroup[] {
   const groups: AutoGroup[] = []
   const home = sparePower(panelWidgets(plan, null).map(widget => chosen(widget.auto, widget.choice)))
   if (home.length) {
-    const title: AutoCard = { type: 'custom:dio-title', title: plan.home?.name || 'Home', never_hide: true }
+    const title: AutoCard = { type: 'custom:holo-title', title: plan.home?.name || 'Home', never_hide: true }
     groups.push({ room: null, cards: [title, ...home] })
   }
   for (const room of panelRooms(plan)) {
