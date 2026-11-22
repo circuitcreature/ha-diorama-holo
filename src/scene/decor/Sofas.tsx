@@ -510,19 +510,20 @@ function RailSofa({ w, d, reach, chaise, flip, seats: count, M }: SofaProps) {
   )
 }
 
-// A pouf for each sofa, square, `size` across and `h` tall.
-export function Pouf({ style, size, h, M }: { style: string; size: number; h: number; M: Slot }) {
+// A pouf for each sofa, `w` wide, `d` deep and `h` tall: square as a pouf,
+// long as an ottoman.
+export function Pouf({ style, w, d, h, M }: { style: string; w: number; d: number; h: number; M: Slot }) {
   if (style === 'block') {
     // A soft cube on the plinth sofa's setback plinth.
     const [plinthH, setback] = BLOCK_PLINTH
     const blockH = h - plinthH
     return (
       <group>
-        <Panel size={[size - setback * 2, plinthH, size - setback * 2]} radius={0.01}>
+        <Panel size={[w - setback * 2, plinthH, d - setback * 2]} radius={0.01}>
           {M('legs')}
         </Panel>
         <Soft
-          size={[size, blockH, size]}
+          size={[w, blockH, d]}
           round={[0.035, Math.min(0.04, blockH / 3), 0.035]}
           puff={[0.006, 0.01, 0.006]}
           position={[0, plinthH + blockH / 2, 0]}
@@ -537,13 +538,14 @@ export function Pouf({ style, size, h, M }: { style: string; size: number; h: nu
     // cushion laid in it.
     const railH = 0.06
     const frameTop = Math.max(h - 0.12, railH + 0.05)
-    const edge = size / 2 - 0.035
+    const edgeX = w / 2 - 0.035
+    const edgeZ = d / 2 - 0.035
     const t = 0.028
     return (
       <group>
         {[-1, 1].flatMap(sx =>
           [-1, 1].map(sz => (
-            <TopLeg key={`${sx}:${sz}`} x={sx * edge} z={sz * edge} height={frameTop} radius={RAIL_LEG_R}>
+            <TopLeg key={`${sx}:${sz}`} x={sx * edgeX} z={sz * edgeZ} height={frameTop} radius={RAIL_LEG_R}>
               {M('legs')}
             </TopLeg>
           )),
@@ -551,23 +553,23 @@ export function Pouf({ style, size, h, M }: { style: string; size: number; h: nu
         {[-1, 1].map(s => (
           <group key={s}>
             <Panel
-              size={[size - 0.03, railH, t]}
+              size={[w - 0.03, railH, t]}
               radius={0.004}
-              position={[0, frameTop - railH, s * (size / 2 - t / 2 - 0.015)]}
+              position={[0, frameTop - railH, s * (d / 2 - t / 2 - 0.015)]}
             >
               {M('legs')}
             </Panel>
             <Panel
-              size={[t, railH, size - 0.03]}
+              size={[t, railH, d - 0.03]}
               radius={0.004}
-              position={[s * (size / 2 - t / 2 - 0.015), frameTop - railH, 0]}
+              position={[s * (w / 2 - t / 2 - 0.015), frameTop - railH, 0]}
             >
               {M('legs')}
             </Panel>
           </group>
         ))}
         <Soft
-          size={[size - 0.04, h - frameTop + 0.02, size - 0.04]}
+          size={[w - 0.04, h - frameTop + 0.02, d - 0.04]}
           round={[0.05, 0.05, 0.05]}
           puff={[0, 0.012, 0]}
           position={[0, (h + frameTop - 0.02) / 2, 0]}
@@ -579,16 +581,17 @@ export function Pouf({ style, size, h, M }: { style: string; size: number; h: nu
   }
   // The pillow arm sofa's base alone, as one upholstered block on its legs.
   const legH = Math.min(SOFA_LEG_H, h * 0.45)
-  const edge = size / 2 - 0.1
+  const edgeX = w / 2 - 0.1
+  const edgeZ = d / 2 - 0.1
   const legs: LegAt[] = [-1, 1].flatMap(sx =>
-    [-1, 1].map(sz => ({ x: sx * edge, z: sz * edge, out: [sx, sz] as [number, number] })),
+    [-1, 1].map(sz => ({ x: sx * edgeX, z: sz * edgeZ, out: [sx, sz] as [number, number] })),
   )
   const blockH = h - legH
   return (
     <group>
       <SofaLegs legs={legs} height={legH} M={M} />
       <Soft
-        size={[size, blockH, size]}
+        size={[w, blockH, d]}
         round={[0.05, Math.min(0.06, blockH / 3), 0.05]}
         puff={[0.006, 0.01, 0.006]}
         position={[0, legH + blockH / 2, 0]}

@@ -79,6 +79,7 @@ const FAMILY_MODELS: Record<string, FamilyModel> = {
   light: LightModel,
   seating: FurnitureModel,
   table: FurnitureModel,
+  shapes: FurnitureModel,
   storage: FurnitureModel,
   bed: FurnitureModel,
   kitchen: ApplianceModel,

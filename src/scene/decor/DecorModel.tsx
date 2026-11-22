@@ -239,6 +239,7 @@ export default function DecorModel({ kind, item, state }: Props) {
           h={p('height')}
           reach={p('reach')}
           flip={p(style === 'quarter' ? 'flip' : 'rail') > 0.5}
+          railed={p('no_rail') < 0.5}
           paint={paint}
         />
       )

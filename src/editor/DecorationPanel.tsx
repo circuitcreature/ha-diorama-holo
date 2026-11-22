@@ -81,6 +81,9 @@ type Props = {
   // Where trying a piece starts: its device as the home was, or off.
   tryStart: (id: string, kind: DecorationKind) => TryState
   onTry: (id: string, state: TryState | null) => void
+  // The card's blueprint colors while it is in that style, which a piece's
+  // own colors stand in for. Null while the card is drawn solid.
+  blueprint?: { line: string; fill: string } | null
 }
 
 const accent = EDITOR_TINT_COLOR
@@ -159,6 +162,7 @@ export default function DecorationPanel({
   tries,
   tryStart,
   onTry,
+  blueprint = null,
 }: Props) {
   const [hovered, setHovered] = useState<DecorationKind | null>(null)
   const [query, setQuery] = useState('')
@@ -638,6 +642,40 @@ export default function DecorationPanel({
             </label>
           ))}
         </div>
+
+        {/* The piece's own colors in the blueprint style, over the card's.
+            Only there while the card is drawn in it. */}
+        {blueprint && (
+          <div className={group}>
+            <p className={groupTitle}>Blueprint</p>
+            {(
+              [
+                ['line', 'Line', blueprint.line],
+                ['fill', 'Fill', blueprint.fill],
+              ] as const
+            ).map(([slot, label, fallback]) => (
+              <label key={slot} className={cn(row, 'grid-cols-[96px_1fr_24px]')}>
+                {label}
+                <input
+                  type="color"
+                  className={colorWell}
+                  aria-label={`Blueprint ${label.toLowerCase()} color`}
+                  value={item.blueprint?.[slot] ?? fallback}
+                  onChange={e => onUpdate(item.id, { blueprint: { ...item.blueprint, [slot]: e.target.value } })}
+                />
+                <ResetButton
+                  label={`Blueprint ${label.toLowerCase()}`}
+                  changed={item.blueprint?.[slot] !== undefined}
+                  onReset={() => {
+                    const { [slot]: _, ...rest } = item.blueprint ?? {}
+                    onUpdate(item.id, { blueprint: Object.keys(rest).length ? rest : undefined })
+                  }}
+                />
+              </label>
+            ))}
+            <p className={note}>Over the card's own colors, for this piece alone. Its own fill is solid.</p>
+          </div>
+        )}
 
         {/* How a light glows when its device does not say: a switch, or a
             light with only a brightness. Each control stands, greyed out,

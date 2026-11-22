@@ -7,6 +7,7 @@ import { redrawShadows, showOnly } from '#/scene/focus.ts'
 import { setComposed } from '#/scene/warm.ts'
 import { isOpening } from '#/scene/Opening.tsx'
 import { EdgeFadeEffect } from '#/scene/edgeFade.ts'
+import { BlueprintEdgesEffect } from '#/scene/blueprintEdges.ts'
 import { useFrame, useThree } from '@react-three/fiber'
 import { N8AOPostPass } from 'n8ao'
 import {
@@ -145,6 +146,9 @@ type Props = {
   focus?: string | null
   // Fades the picture away towards the edges, see edgeFade.ts.
   edgeFade?: boolean
+  // The line color of the blueprint style, which traces every edge in the
+  // finished picture, see blueprintEdges.ts. None draws no lines.
+  lines?: string | null
 }
 
 type Pipeline = {
@@ -154,9 +158,10 @@ type Pipeline = {
   // already there it replaces: all of it, but for the second picture of a
   // fade.
   paint: Material
+  lines: BlueprintEdgesEffect | null
 }
 
-export default function Effects({ selected, focus = null, edgeFade = false }: Props) {
+export default function Effects({ selected, focus = null, edgeFade = false, lines = null }: Props) {
   const gl = useThree(state => state.gl)
   const scene = useThree(state => state.scene)
   const camera = useThree(state => state.camera)
@@ -171,6 +176,13 @@ export default function Effects({ selected, focus = null, edgeFade = false }: Pr
   // changed in place every frame, which is what refs are for.
   const pipeline = useRef<Pipeline | null>(null)
   const outlined = selected !== undefined
+  const traced = lines !== null
+  // The line color the composer starts its lines in, read when it is built.
+  // A change after that is set on the lines already built, below.
+  const lineColor = useRef(lines)
+  useEffect(() => {
+    lineColor.current = lines
+  }, [lines])
   useEffect(() => {
     // Half float, so the scene keeps its range until it is tone mapped.
     const composer = new EffectComposer(gl, { frameBufferType: HalfFloatType })
@@ -197,11 +209,14 @@ export default function Effects({ selected, focus = null, edgeFade = false }: Pr
         multisampling: 4,
       })
     }
+    // The lines come after the tone mapping, so they keep their color.
+    const edges = lineColor.current ? new BlueprintEdgesEffect(scene, camera, lineColor.current) : null
     const last = new EffectPass(
       camera,
       ...(outline ? [outline] : []),
       new SMAAEffect({ preset: SMAAPreset.HIGH }),
       new ToneMappingEffect({ mode: ToneMappingMode.ACES_FILMIC }),
+      ...(edges ? [edges] : []),
       ...(edgeFade ? [new EdgeFadeEffect()] : []),
     )
     // The picture replaces a share of what the screen holds. The share is
@@ -222,7 +237,7 @@ export default function Effects({ selected, focus = null, edgeFade = false }: Pr
       renderer.autoClear = clears
     }
     composer.addPass(last)
-    pipeline.current = { composer, outline, paint }
+    pipeline.current = { composer, outline, paint, lines: edges }
     composers.set(gl, composer)
     found.current = null
     // The shaders the scene needs are now the ones for drawing into a
@@ -235,13 +250,20 @@ export default function Effects({ selected, focus = null, edgeFade = false }: Pr
       // The composer disposes of its passes, and they of their effects.
       composer.dispose()
     }
-  }, [gl, scene, camera, outlined, edgeFade])
+  }, [gl, scene, camera, outlined, edgeFade, traced])
 
   useEffect(() => {
     // The composer sizes its buffers from the canvas, which follows the
     // pixel ratio, and this only tells it the canvas has changed.
     pipeline.current?.composer.setSize(size.width, size.height, false)
-  }, [gl, scene, camera, outlined, edgeFade, size.width, size.height, dpr])
+    if (pipeline.current?.lines) pipeline.current.lines.pixelRatio = dpr
+  }, [gl, scene, camera, outlined, edgeFade, traced, size.width, size.height, dpr])
+
+  // A new line color is drawn on the lines already built.
+  useEffect(() => {
+    if (lines && pipeline.current?.lines) pipeline.current.lines.color = lines
+    invalidate()
+  }, [lines, traced, invalidate])
 
   // Frames are drawn on request, and a new pick or a new size is one.
   useEffect(() => {

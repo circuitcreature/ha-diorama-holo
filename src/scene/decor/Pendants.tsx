@@ -15,6 +15,11 @@ import {
   CIRIO_H,
   CIRIO_R,
   CIRIO_WALL,
+  CONE_CANOPY,
+  CONE_COLLAR,
+  CONE_H,
+  CONE_R,
+  CONE_WALL,
   HEADHAT_H,
   HEADHAT_R,
   HEADHAT_SHOULDER,
@@ -25,6 +30,10 @@ import {
   NAGOYA_R,
   NAGOYA_SLATS,
   NAGOYA_THREADS,
+  ORB_CANOPY,
+  ORB_COLLAR,
+  ORB_R,
+  ORB_ROD_R,
   TEXTILE_CORD_R,
 } from '#/scene/decor/pendantSpecs.ts'
 import { CESTITA_GLOBE, CESTITA_GLOBE_R } from '#/scene/decor/tableLampSpecs.ts'
@@ -32,8 +41,8 @@ import { CEILING_HEIGHT_M } from '#/theme.ts'
 import { useLayoutEffect, useMemo, useRef, type ReactNode } from 'react'
 import { InstancedMesh, Matrix4, Quaternion, Vector2, Vector3 } from 'three'
 
-// The pendant styles, each one a Santa & Cole lamp drawn from its technical
-// drawing. Every part is in real meters, measured down from the top of the
+// The pendant styles, each but the glass orb and the cone a Santa & Cole
+// lamp drawn from its technical drawing. Every part is in real meters, measured down from the top of the
 // lamp, so the numbers here can be checked against the drawings. The size
 // slider scales the lamp itself; the canopy and the cord stay their real
 // size, since a bigger shade does not come with a thicker cable.
@@ -316,11 +325,78 @@ function CirioSimple({ k, top, c, m, state }: ModelProps) {
   )
 }
 
+// Glass Orb: an opal sphere on a collar, hung from a rigid rod. The size
+// slider scales the sphere and its collar; the rod and the canopy keep their
+// own size, and the rod reaches up to the canopy however long it is.
+function Orb({ k, top, c, m, state }: ModelProps) {
+  const [collarR, collarH] = ORB_COLLAR
+  return (
+    <>
+      <group position={[0, top, 0]} scale={k}>
+        <mesh position={[0, -collarH - ORB_R, 0]} userData={{ transmits: true }}>
+          <sphereGeometry args={[ORB_R, SEG * 2, SEG * 2]} />
+          <ShadeMaterial color={c('globe')} material={m('globe')} state={state} />
+        </mesh>
+        <mesh position={[0, -collarH / 2, 0]}>
+          <cylinderGeometry args={[collarR, collarR * 1.15, collarH, SEG * 2]} />
+          <BaseMaterial color={c('rod')} material={m('rod')} />
+        </mesh>
+      </group>
+      <Cord from={top} to={CEILING_HEIGHT_M - ORB_CANOPY[1]} r={ORB_ROD_R} c={c('rod')} m={m('rod')} />
+      <Canopy diameter={ORB_CANOPY[0]} height={ORB_CANOPY[1]} c={c('canopy')} m={m('canopy')} />
+    </>
+  )
+}
+
+// Cone: a straight sided metal cone hung from a collar at its tip, open
+// underneath. Metal is opaque, so the outside keeps its color and the inside
+// is what lights up. The size slider scales the cone and its collar; the
+// cord and the canopy keep their own size.
+function coneProfile(inset: number): [number, number][] {
+  const [collarR, collarH] = CONE_COLLAR
+  return [
+    [CONE_R - inset, -CONE_H],
+    [collarR * 0.9 - inset, -collarH - inset],
+  ]
+}
+const CONE_OUTSIDE = lathe(coneProfile(0))
+const CONE_INSIDE = lathe(coneProfile(CONE_WALL))
+
+function Cone({ k, top, c, m, state }: ModelProps) {
+  const [collarR, collarH] = CONE_COLLAR
+  return (
+    <>
+      <group position={[0, top, 0]} scale={k}>
+        <mesh position={[0, -collarH / 2, 0]}>
+          <cylinderGeometry args={[collarR * 0.8, collarR, collarH, SEG * 2]} />
+          <BaseMaterial color={c('shade')} material={m('shade')} />
+        </mesh>
+        <mesh>
+          <latheGeometry args={[CONE_OUTSIDE, SEG * 2]} />
+          <Material color={c('shade')} material={m('shade')} doubleSide />
+        </mesh>
+        <mesh userData={{ transmits: true }}>
+          <latheGeometry args={[CONE_INSIDE, SEG * 2]} />
+          <ShadeMaterial color={c('inside')} material={m('inside')} state={state} />
+        </mesh>
+        <mesh position={[0, -CONE_H, 0]} rotation={[Math.PI / 2, 0, 0]}>
+          <ringGeometry args={[CONE_R - CONE_WALL, CONE_R, SEG * 2]} />
+          <BaseMaterial color={c('shade')} material={m('shade')} />
+        </mesh>
+      </group>
+      <Cord from={top} to={CEILING_HEIGHT_M - CONE_CANOPY[1]} r={TEXTILE_CORD_R} c={c('cord')} m={m('cord')} />
+      <Canopy diameter={CONE_CANOPY[0]} height={CONE_CANOPY[1]} c={c('canopy')} m={m('canopy')} />
+    </>
+  )
+}
+
 const MODELS: Record<string, (props: ModelProps) => ReactNode> = {
   nagoya: Nagoya,
   globo_cestita: GloboCestita,
   headhat_bowl: HeadhatBowl,
   cirio_simple: CirioSimple,
+  orb: Orb,
+  cone: Cone,
 }
 
 export default function Pendant({ style, ...props }: ModelProps & { style: string }) {

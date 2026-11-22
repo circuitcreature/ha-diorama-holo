@@ -16,6 +16,9 @@ import {
   faClock,
   faComputer,
   faCube,
+  faCircle,
+  faDatabase,
+  faShapes,
   faCouch,
   faDoorClosed,
   faDoorOpen,
@@ -81,9 +84,13 @@ const BY_KIND: Record<string, IconDefinition> = {
   stool: faChair,
   bench: faChair,
   pouf: faChair,
+  ottoman: faChair,
   light_globe: faLightbulb,
   ceiling_extractor: faWind,
   bookshelf: faBoxArchive,
+  box: faCube,
+  cylinder: faDatabase,
+  sphere: faCircle,
   wardrobe: faShirt,
   fridge: faSnowflake,
   oven: faFire,
@@ -183,6 +190,7 @@ const BY_FAMILY: Record<string, IconDefinition> = {
   security: faBell,
   utility: faPlug,
   outdoor: faTree,
+  shapes: faShapes,
   custom: faCube,
 }
 
@@ -204,5 +212,6 @@ export const FAMILY_LABELS: Record<string, string> = {
   security: 'Security and sensors',
   utility: 'Smart home',
   outdoor: 'Garden and outdoor',
+  shapes: 'Shapes',
   custom: 'My models',
 }

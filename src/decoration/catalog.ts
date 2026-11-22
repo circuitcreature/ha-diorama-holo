@@ -151,7 +151,7 @@ export function invertible(kind: DecorationKind) {
 
 // Vertical parameters: how tall something is, or how high it sits. They are
 // kept inside a room, a little above the ceiling at most.
-const VERTICAL = new Set(['height', 'sill', 'lift', 'drop', 'cord', 'hem'])
+const VERTICAL = new Set(['height', 'sill', 'lift', 'drop', 'cord', 'hem', 'base'])
 const CEILING_LIMIT_M = 3
 const round2 = (value: number) => Math.round(value * 100) / 100
 
@@ -560,7 +560,8 @@ export const DECORATION_KINDS: DecorationKind[] = [
     PENDANT_NAGOYA.colors ?? {},
     PENDANT_NAGOYA.materials ?? {},
     LIGHT_SIGNALS,
-    // Four Santa & Cole lamps, each drawn from its dimensional drawing.
+    // Four Santa & Cole lamps, each drawn from its dimensional drawing, a
+    // plain glass orb on a rod and a plain metal cone.
     [
       PENDANT_NAGOYA,
       {
@@ -599,6 +600,29 @@ export const DECORATION_KINDS: DecorationKind[] = [
           cord: PENDANT_BLACK_COLOR,
         },
         materials: { shade: 'ceramic', capsule: 'metal', canopy: 'metal', cord: 'fabric' },
+      },
+      {
+        id: 'orb',
+        label: 'Glass Orb',
+        // A Ø30 opal sphere on a rigid rod. Size is the sphere's diameter
+        // and the cord length is the rod's.
+        params: { size: 0.3, cord: 0.6 },
+        colors: { globe: PENDANT_OPAL_COLOR, rod: PENDANT_BLACK_COLOR, canopy: PENDANT_BLACK_COLOR },
+        materials: { globe: 'matte', rod: 'metal', canopy: 'metal' },
+      },
+      {
+        id: 'cone',
+        label: 'Metal Cone',
+        // A Ø30 black metal cone 26 cm tall, white inside. Size is the rim's
+        // diameter.
+        params: { size: 0.3 },
+        colors: {
+          shade: PENDANT_BLACK_COLOR,
+          inside: '#f3f1ec',
+          cord: PENDANT_BLACK_COLOR,
+          canopy: PENDANT_BLACK_COLOR,
+        },
+        materials: { shade: 'metal', inside: 'matte', cord: 'fabric', canopy: 'metal' },
       },
     ],
   ),
@@ -1008,6 +1032,34 @@ export const DECORATION_KINDS: DecorationKind[] = [
       },
     ],
   ),
+  kind(
+    'ottoman',
+    'seating',
+    'Ottoman',
+    'floor',
+    // The pouf drawn long, to stand in front of a sofa or at the foot of a
+    // bed: one in each sofa's style, its own width, depth and height.
+    [width(1.2, 0.5, 2.5), depth(0.6, 0.35, 1.2), height(0.42, 0.25, 0.55)],
+    { cover: SOFA_FABRIC_COLOR, legs: SOFA_LEG_COLOR },
+    { cover: 'fabric', legs: 'matte' },
+    NONE,
+    [
+      { id: 'dresde', label: 'Pillow Arm' },
+      {
+        id: 'block',
+        label: 'Plinth Block',
+        params: { width: 1.1, depth: 0.7 },
+        colors: { cover: '#c9bda9', legs: '#3a3531' },
+      },
+      {
+        id: 'rail',
+        label: 'Teak Rail',
+        params: { width: 1.0, depth: 0.5 },
+        colors: { cover: '#6f7a67', legs: '#9a6a42' },
+        materials: { cover: 'fabric', legs: 'wood' },
+      },
+    ],
+  ),
 
   // Tables
   kind(
@@ -1146,6 +1198,46 @@ export const DECORATION_KINDS: DecorationKind[] = [
         materials: { top: 'matte', legs: 'matte', drawer: 'matte', handle: 'metal' },
       },
     ],
+  ),
+
+  // Shapes
+  kind(
+    'box',
+    'shapes',
+    'Box',
+    'floor',
+    // A plain block of any size: a plinth, a low table, a step, a stand
+    // for something to go on, or a stand in for a piece the catalog lacks.
+    // Things stand on its top like on a table's. Raised off the floor it
+    // floats there, a shelf or a ledge, and takes what is on it up too.
+    [width(0.8, 0.1, 4), depth(0.5, 0.1, 3), height(0.45, 0.05, 2.6), p('base', 'Elevation', 0, 0, 2.5)],
+    { box: SCANDI.offWhite },
+    { box: 'matte' },
+    NONE,
+  ),
+  kind(
+    'cylinder',
+    'shapes',
+    'Cylinder',
+    'floor',
+    // Size is its diameter and height its length, standing up, or lying
+    // on its side along its width, turned on the plan like any piece: a
+    // column, a drum table, a pipe, a log, a bolster.
+    [size(0.4, 0.05, 3), height(0.45, 0.05, 2.6), flag('lying', 'On its side'), p('base', 'Elevation', 0, 0, 2.5)],
+    { shape: SCANDI.offWhite },
+    { shape: 'matte' },
+    NONE,
+  ),
+  kind(
+    'sphere',
+    'shapes',
+    'Sphere',
+    'floor',
+    // Size is its diameter: a ball, a globe, a round stool or a boulder.
+    [size(0.4, 0.05, 3), p('base', 'Elevation', 0, 0, 2.5)],
+    { shape: SCANDI.offWhite },
+    { shape: 'matte' },
+    NONE,
   ),
 
   // Storage
@@ -1829,6 +1921,7 @@ export const DECORATION_KINDS: DecorationKind[] = [
       only(p('reach', 'Second flight', 1.6, 0.5, 4), ['quarter']),
       only(flag('flip', 'Turn left'), ['quarter']),
       only(flag('rail', 'Rail on left'), ['open', 'closed']),
+      only(flag('no_rail', 'No rail'), ['open', 'closed', 'quarter']),
     ],
     STAIRS_OPEN.colors ?? {},
     STAIRS_OPEN.materials ?? {},
@@ -3597,6 +3690,11 @@ export function footprint(
   if (kind.family === 'light' && kind.params.some(x => x.id === 'length')) {
     return [paramValue(kind, params, 'length', variant), 0.08]
   }
+  // A cylinder on its side lies along its width, its length across the plan.
+  if (kind.id === 'cylinder' && paramValue(kind, params, 'lying', variant) > 0.5) {
+    const v = (id: string) => paramValue(kind, params, id, variant)
+    return [v('height'), v('size')]
+  }
   // A railing is a thin run, as deep as its handrail.
   if (kind.id === 'railing') return [paramValue(kind, params, 'width', variant), 0.08]
   // A quarter turn stair takes its second flight out to the side.
@@ -3741,6 +3839,8 @@ export function cycleLength(kind: DecorationKind, params: Record<string, number>
 const SURFACE_TOPS: Record<string, string | number | Record<string, number>> = {
   dining_table: 'height',
   coffee_table: 'height',
+  box: 'height',
+  cylinder: 'height',
   side_table: 'height',
   desk: 'height',
   sideboard: 'height',
@@ -3775,6 +3875,10 @@ export const builtInDepth = (kind: DecorationKind) => BUILT_IN[kind.id] ?? 0
 
 // Height of an item's top surface above its own base.
 export function surfaceTop(kind: DecorationKind, params: Record<string, number> | undefined, variant?: string) {
+  // A cylinder on its side is as high as it is wide.
+  if (kind.id === 'cylinder' && paramValue(kind, params, 'lying', variant) > 0.5) {
+    return paramValue(kind, params, 'size', variant)
+  }
   const top = SURFACE_TOPS[kind.id]
   if (typeof top === 'number') return top
   if (typeof top === 'string') return paramValue(kind, params, top, variant)

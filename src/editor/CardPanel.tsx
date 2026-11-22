@@ -9,7 +9,7 @@ import { colorWell, field, group, groupTitle, note } from '#/editor/look.ts'
 import ControlsGuide from '#/editor/ControlsGuide.tsx'
 import { ResetButton, Slider, Switch } from '#/editor/panel.tsx'
 import { SUN_DIRECTION_DEG } from '#/constants.ts'
-import { BLUEPRINT_COLOR, EDITOR_TINT_COLOR } from '#/theme.ts'
+import { BLUEPRINT_COLOR, BLUEPRINT_OBJECTS_COLOR, EDITOR_TINT_COLOR } from '#/theme.ts'
 import { entityName } from '#/devices/catalog.ts'
 import type {
   BackgroundConfig,
@@ -113,17 +113,25 @@ export default function CardPanel({ hass, config, onChange, opening, onOpen }: P
     onChange(on ? { ...rest, first_click: 'room' } : rest)
   }
 
-  // The blueprint style and its line color, the color left out at its default.
+  // The blueprint style, its line color, left out at its default, and the
+  // solid color of the furniture, left out while the furniture is glass.
+  // Turning the style off keeps both colors for when it is turned on again.
   const blueprint = config.style === 'blueprint'
   const setBlueprint = (on: boolean) => {
-    const { style: _, style_color: __, ...rest } = config
-    onChange(
-      on ? { ...rest, style: 'blueprint', ...(config.style_color && { style_color: config.style_color }) } : rest,
-    )
+    const { style: _, ...rest } = config
+    onChange(on ? { ...rest, style: 'blueprint' } : rest)
   }
   const setBlueprintColor = (color: string) => {
     const { style_color: _, ...rest } = config
     onChange(color === BLUEPRINT_COLOR ? rest : { ...rest, style_color: color })
+  }
+  const setArrowsColor = (color: string | null) => {
+    const { style_arrows: _, ...rest } = config
+    onChange(color ? { ...rest, style_arrows: color } : rest)
+  }
+  const setObjectsColor = (color: string | null) => {
+    const { style_objects: _, ...rest } = config
+    onChange(color ? { ...rest, style_objects: color } : rest)
   }
 
   // Which way the sun comes from, left out of the YAML at its default.
@@ -658,6 +666,54 @@ export default function CardPanel({ hass, config, onChange, opening, onOpen }: P
                   onReset={() => setBlueprintColor(BLUEPRINT_COLOR)}
                 />
               </span>
+            </label>
+          )}
+          {blueprint && (
+            <label className="border-separator flex cursor-pointer items-center justify-between gap-4 border-t py-2.5">
+              <span className="flex min-w-0 flex-col">
+                <span className="text-[13px]">Arrow color</span>
+                <span className="text-label-2 text-xs">The arrows on the floor that lead to the next room.</span>
+              </span>
+              <span className="flex items-center gap-2">
+                <input
+                  type="color"
+                  className={colorWell}
+                  value={config.style_arrows ?? config.style_color ?? BLUEPRINT_COLOR}
+                  onChange={e => setArrowsColor(e.target.value)}
+                />
+                <ResetButton
+                  label="Arrow color"
+                  changed={config.style_arrows !== undefined}
+                  onReset={() => setArrowsColor(null)}
+                />
+              </span>
+            </label>
+          )}
+          {blueprint && (
+            <label className="border-separator flex cursor-pointer items-center justify-between gap-4 border-t py-2.5">
+              <span className="flex min-w-0 flex-col">
+                <span className="text-[13px]">Solid objects</span>
+                <span className="text-label-2 text-xs">
+                  Furniture and everything placed in the rooms in one solid color. Walls, doors and windows stay glass.
+                </span>
+              </span>
+              <Switch
+                checked={!!config.style_objects}
+                accent={EDITOR_TINT_COLOR}
+                label="Solid objects"
+                onChange={on => setObjectsColor(on ? BLUEPRINT_OBJECTS_COLOR : null)}
+              />
+            </label>
+          )}
+          {blueprint && config.style_objects && (
+            <label className="border-separator flex cursor-pointer items-center justify-between gap-4 border-t py-2.5">
+              <span className="text-[13px]">Object color</span>
+              <input
+                type="color"
+                className={colorWell}
+                value={config.style_objects}
+                onChange={e => setObjectsColor(e.target.value)}
+              />
             </label>
           )}
         </div>

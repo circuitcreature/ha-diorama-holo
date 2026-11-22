@@ -214,6 +214,9 @@ export type DecorationConfig = {
   light_brightness?: number
   // Which of the kind's styles it is drawn in. The kind's first when absent.
   variant?: string
+  // Its own colors in the blueprint style, over the card's: the lines along
+  // its edges and a solid fill, as hex strings.
+  blueprint?: { line?: string; fill?: string }
   // Set by the card, never saved: a flight of stairs seen from the floor it
   // leads up to is drawn this far below that floor, so its top meets it.
   below?: number
@@ -305,6 +308,13 @@ export type CardConfig = {
   style?: 'blueprint'
   // The line color of the blueprint style, as a hex string.
   style_color?: string
+  // A solid color the blueprint style fills the furniture and everything
+  // else placed in the rooms with, as a hex string. Walls, doors, windows
+  // and stairs stay glass. Without it everything is glass.
+  style_objects?: string
+  // The color of the blueprint style's signs on the floor that lead to the
+  // room beside, as a hex string. The line color when absent.
+  style_arrows?: string
   // Sizes of the side panel's layout for each screen it is seen on, by the
   // id the screen gave itself. Set from the card's settings on that screen.
   screens?: Record<string, ScreenConfig>

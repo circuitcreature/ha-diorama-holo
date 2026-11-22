@@ -10,7 +10,7 @@ import {
 } from '#/constants.ts'
 import { cn } from '#/lib/utils.ts'
 import { BLUEPRINT_COLOR, ROOM_CORNER_RADIUS_M, ROOM_GAP_M } from '#/theme.ts'
-import Blueprint from '#/scene/Blueprint.tsx'
+import Blueprint, { unmerged } from '#/scene/Blueprint.tsx'
 import Adaptive from '#/scene/Adaptive.tsx'
 import Bvh from '#/scene/bvh.tsx'
 import CameraRig, { type CameraHandle } from '#/scene/CameraRig.tsx'
@@ -33,7 +33,7 @@ import type { CardConfig, HomeAssistant } from '#/types.ts'
 import { OrbitControls } from '@react-three/drei'
 import { Canvas } from '@react-three/fiber'
 import { MathUtils, PCFShadowMap } from 'three'
-import { useCallback, useRef, useState, type RefObject } from 'react'
+import { useCallback, useMemo, useRef, useState, type RefObject } from 'react'
 
 export type { CameraHandle } from '#/scene/CameraRig.tsx'
 
@@ -125,6 +125,15 @@ export default function Scene({
   // mounted once it is there to listen on.
   const [frame, setFrame] = useState<HTMLDivElement | null>(null)
   const [shown, setShown] = useState(false)
+  const blueprint = config.style === 'blueprint'
+  const lineColor = config.style_color ?? BLUEPRINT_COLOR
+  // In the blueprint style some pieces are kept out of the merged furniture,
+  // so they can be told apart from it, see Blueprint.tsx.
+  const keep = useMemo(() => {
+    const stairsKept = onStairs ? stairs : undefined
+    if (!blueprint) return stairsKept
+    return new Set([...unmerged(config), ...(stairsKept ?? [])])
+  }, [blueprint, config, onStairs, stairs])
   const show = useCallback(() => setShown(true), [])
 
   return (
@@ -206,7 +215,7 @@ export default function Scene({
         {/* In the card, the pieces with no device behind them are drawn
           together, a room at a time. In the editor every piece is its own,
           so it can be picked and tried. */}
-        {!onPickDecoration && !onTry && <Merged config={config} keep={onStairs ? stairs : undefined} />}
+        {!onPickDecoration && !onTry && <Merged config={config} keep={keep} />}
         {/* A press that misses everything looks around itself for something
           to act on, so small things are still easy to hit, and only then
           asks whether it landed on a room's floor. */}
@@ -218,8 +227,8 @@ export default function Scene({
         {/* The frame is finished from a buffer: shaded where things meet,
           tone mapped, softly darkened at the corners, and in the editor with
           the picked thing outlined. */}
-        <Effects selected={selected} focus={focus} edgeFade={edgeFade} />
-        {config.style === 'blueprint' && <Blueprint color={config.style_color ?? BLUEPRINT_COLOR} />}
+        <Effects selected={selected} focus={focus} edgeFade={edgeFade} lines={blueprint ? lineColor : null} />
+        {blueprint && <Blueprint config={config} color={lineColor} />}
         {rooms.map((room, i) => (
           <Room
             key={room.id}

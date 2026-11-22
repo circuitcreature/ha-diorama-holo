@@ -9,6 +9,18 @@ moves that section under the new version and uses it as the release notes.
 
 ## [Unreleased]
 
+### Added
+
+- The Blueprint style can fill the furniture with a solid color of its own, with the walls, doors and windows left as glass, any piece can have a line and fill color of its own over the card's, and the arrows to the next room are solid in a color you can pick.
+- Two new pendant styles: a Glass Orb, an opal sphere on a rigid rod whose length you set, and a Metal Cone, black outside and lit white inside.
+- An Ottoman in each of the sofa's three styles, with its own width, depth and height.
+- Stairs can leave out their rail with a No rail switch.
+- A new Shapes category with a Box, a Cylinder that stands up or lies on its side, and a Sphere, each of any size and raised to any height. Other pieces can stand on the box and the cylinder like on a table.
+
+### Fixed
+
+- The Blueprint style outlines every corner and piece of furniture, rounded ones too, and no longer draws lines across floors or twice along their edges.
+
 ## [1.12.0] - 2026-11-22
 
 ### Added

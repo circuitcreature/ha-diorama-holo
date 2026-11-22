@@ -47,6 +47,9 @@ type Props = { kind: DecorationKind; item: DecorationConfig; state: ItemState | 
 // Seating, tables, storage and beds. The references are mid century Nordic:
 // slim oak frames on splayed tapered legs, plump linen cushions, plain
 // fronts with small round pulls.
+// How round the cylinder and the sphere are drawn.
+const SHAPE_SEGMENTS = 48
+
 export default function FurnitureModel({ kind, item, state }: Props) {
   const p = (id: string) => paramValue(kind, item.params, id, item.variant)
   const c = (slot: string) => colorValue(kind, item.colors, slot, item.variant)
@@ -92,11 +95,48 @@ export default function FurnitureModel({ kind, item, state }: Props) {
       const style = decorationVariant(kind, item.variant)?.id ?? 'lauta'
       return <Bench style={style} w={p('width')} d={p('depth')} h={p('height')} M={M} />
     }
-    case 'pouf':
-      return (
-        <Pouf style={decorationVariant(kind, item.variant)?.id ?? 'dresde'} size={p('size')} h={p('height')} M={M} />
-      )
+    case 'pouf': {
+      const style = decorationVariant(kind, item.variant)?.id ?? 'dresde'
+      return <Pouf style={style} w={p('size')} d={p('size')} h={p('height')} M={M} />
+    }
+    case 'ottoman': {
+      const style = decorationVariant(kind, item.variant)?.id ?? 'dresde'
+      return <Pouf style={style} w={p('width')} d={p('depth')} h={p('height')} M={M} />
+    }
     // Tables
+    case 'box':
+      // A plain block, its edges just rounded off so they catch the light.
+      return (
+        <Slab size={[p('width'), p('height'), p('depth')]} radius={0.008} bevel={0.004}>
+          {M('box')}
+        </Slab>
+      )
+    case 'cylinder': {
+      const r = p('size') / 2
+      const h = p('height')
+      // Lying down it runs along its width, the x of the plan, resting on
+      // its curve.
+      return p('lying') > 0.5 ? (
+        <mesh position={[0, r, 0]} rotation={[0, 0, Math.PI / 2]} castShadow receiveShadow>
+          <cylinderGeometry args={[r, r, h, SHAPE_SEGMENTS]} />
+          {M('shape')}
+        </mesh>
+      ) : (
+        <mesh position={[0, h / 2, 0]} castShadow receiveShadow>
+          <cylinderGeometry args={[r, r, h, SHAPE_SEGMENTS]} />
+          {M('shape')}
+        </mesh>
+      )
+    }
+    case 'sphere': {
+      const r = p('size') / 2
+      return (
+        <mesh position={[0, r, 0]} castShadow receiveShadow>
+          <sphereGeometry args={[r, SHAPE_SEGMENTS, SHAPE_SEGMENTS / 2]} />
+          {M('shape')}
+        </mesh>
+      )
+    }
     case 'dining_table': {
       // Each style is a real table, laid out again at the size the sliders
       // give it.

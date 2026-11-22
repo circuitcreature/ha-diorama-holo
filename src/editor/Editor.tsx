@@ -28,7 +28,8 @@ import { ridersOf, spotOn } from '#/decoration/surfaces.ts'
 import { entityGone } from '#/devices/catalog.ts'
 import { initialTry, toggleTry, type TryState, type TryStates } from '#/editor/tryState.ts'
 import { deviceTry } from '#/scene/Devices.tsx'
-import { DEFAULT_FLOOR_MATERIAL, SCENE_BACKGROUND_CSS } from '#/theme.ts'
+import { BLUEPRINT_COLOR, DEFAULT_FLOOR_MATERIAL, SCENE_BACKGROUND_CSS } from '#/theme.ts'
+import { glassColor } from '#/scene/Blueprint.tsx'
 import { useBackButton } from '#/lib/backButton.ts'
 import { useFlash } from '#/lib/flash.ts'
 import { cn } from '#/lib/utils.ts'
@@ -1371,6 +1372,14 @@ export default function Editor({ hass, config, onChange, onSave }: Props) {
       onPutOn={putOn}
       onPointTop={setPointedTop}
       onSelect={pickDecoration}
+      blueprint={
+        config.style === 'blueprint'
+          ? {
+              line: config.style_color ?? BLUEPRINT_COLOR,
+              fill: config.style_objects ?? glassColor(config.style_color ?? BLUEPRINT_COLOR),
+            }
+          : null
+      }
       tries={tries}
       tryStart={startOf}
       onTry={setTry}

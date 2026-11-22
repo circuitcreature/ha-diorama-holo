@@ -14,6 +14,8 @@ type Props = {
   reach: number
   // Turns left, or has its rail on the left.
   flip: boolean
+  // Has its rail, and on the closed style the balustrade wall under it.
+  railed: boolean
   paint: Paint
 }
 
@@ -110,7 +112,7 @@ function risers(h: number, least: number) {
 // strings, open between them on the open riser style, or closed by risers
 // and boarded underneath, with a white wall up its open side for a
 // balustrade. The floating style keeps only its treads, held in the wall.
-function Straight({ style, w, l, h, flip, paint }: Omit<Props, 'reach'>) {
+function Straight({ style, w, l, h, flip, railed: wanted, paint }: Omit<Props, 'reach'>) {
   const { count, rise } = risers(h, 2)
   const treads = count - 1
   const going = l / treads
@@ -126,7 +128,7 @@ function Straight({ style, w, l, h, flip, paint }: Omit<Props, 'reach'>) {
   const string = floating ? 0 : open ? 0.015 : 0.03
   const tread = floating ? 0.06 : open ? 0.04 : 0.028
   const inner = floating ? w : w - string * 2
-  const railed = h >= RAILED_FROM
+  const railed = wanted && h >= RAILED_FROM
   // The strings run along the pitch, a hand above the nosings and a deep
   // board below them, cut level at the floor and at the floor above.
   const below = open ? 0.24 : 0.2
@@ -288,7 +290,7 @@ function OpenRail({
 // step is a solid white block with an oak tread on it, the way a stair
 // built into a hall is closed underneath, and a black steel rail runs up
 // the open inside of the turn.
-function Quarter({ w, l, h, reach, flip, paint }: Omit<Props, 'style'>) {
+function Quarter({ w, l, h, reach, flip, railed, paint }: Omit<Props, 'style'>) {
   const { count, rise } = risers(h, 4)
   // One step is the landing, and the last riser climbs onto the floor above.
   const steps = count - 2
@@ -358,46 +360,50 @@ function Quarter({ w, l, h, reach, flip, paint }: Omit<Props, 'style'>) {
       })}
       {/* The rail: a post at the foot, one at the corner of the landing and
           one at the top, a slim bar on every step between them. */}
-      <Post x={bottom[0]} z={bottom[2]} y={0} top={bottom[1]} r={0.022}>
-        {metal}
-      </Post>
-      <Post x={corner[0]} z={corner[2]} y={(n1 + 1) * rise} top={corner[1] + 0.05} r={0.024}>
-        {metal}
-      </Post>
-      <Post x={topEnd[0]} z={topEnd[2]} y={h} top={topEnd[1]} r={0.022}>
-        {metal}
-      </Post>
-      {all.map((step, i) => {
-        if (step.nose === null) return null
-        const x = step.nose === 'z' ? innerX : mid(step.x0, step.x1)
-        const z = step.nose === 'z' ? mid(step.z0, step.z1) : innerZ
-        // Up to the rail over it, which runs straight from post to post.
-        const top =
-          step.nose === 'z'
-            ? lerp(bottom[1], corner[1], (bottom[2] - z) / (bottom[2] - corner[2]))
-            : lerp(corner[1], topEnd[1], (x - corner[0]) / (topEnd[0] - corner[0]))
-        return (
-          <Post key={i} x={x} z={z} y={step.y} top={top} r={0.007}>
+      {railed && (
+        <>
+          <Post x={bottom[0]} z={bottom[2]} y={0} top={bottom[1]} r={0.022}>
             {metal}
           </Post>
-        )
-      })}
-      <mesh
-        position={[innerX, (bottom[1] + corner[1]) / 2, (bottom[2] + corner[2]) / 2]}
-        rotation={[Math.atan2(corner[2] - bottom[2], corner[1] - bottom[1]), 0, 0]}
-        castShadow
-      >
-        <capsuleGeometry args={[RAIL_R, Math.hypot(corner[1] - bottom[1], corner[2] - bottom[2]), 6, 16]} />
-        {metal}
-      </mesh>
-      <mesh
-        position={[(corner[0] + topEnd[0]) / 2, (corner[1] + topEnd[1]) / 2, innerZ]}
-        rotation={[0, 0, -Math.atan2(topEnd[0] - corner[0], topEnd[1] - corner[1])]}
-        castShadow
-      >
-        <capsuleGeometry args={[RAIL_R, Math.hypot(topEnd[0] - corner[0], topEnd[1] - corner[1]), 6, 16]} />
-        {metal}
-      </mesh>
+          <Post x={corner[0]} z={corner[2]} y={(n1 + 1) * rise} top={corner[1] + 0.05} r={0.024}>
+            {metal}
+          </Post>
+          <Post x={topEnd[0]} z={topEnd[2]} y={h} top={topEnd[1]} r={0.022}>
+            {metal}
+          </Post>
+          {all.map((step, i) => {
+            if (step.nose === null) return null
+            const x = step.nose === 'z' ? innerX : mid(step.x0, step.x1)
+            const z = step.nose === 'z' ? mid(step.z0, step.z1) : innerZ
+            // Up to the rail over it, which runs straight from post to post.
+            const top =
+              step.nose === 'z'
+                ? lerp(bottom[1], corner[1], (bottom[2] - z) / (bottom[2] - corner[2]))
+                : lerp(corner[1], topEnd[1], (x - corner[0]) / (topEnd[0] - corner[0]))
+            return (
+              <Post key={i} x={x} z={z} y={step.y} top={top} r={0.007}>
+                {metal}
+              </Post>
+            )
+          })}
+          <mesh
+            position={[innerX, (bottom[1] + corner[1]) / 2, (bottom[2] + corner[2]) / 2]}
+            rotation={[Math.atan2(corner[2] - bottom[2], corner[1] - bottom[1]), 0, 0]}
+            castShadow
+          >
+            <capsuleGeometry args={[RAIL_R, Math.hypot(corner[1] - bottom[1], corner[2] - bottom[2]), 6, 16]} />
+            {metal}
+          </mesh>
+          <mesh
+            position={[(corner[0] + topEnd[0]) / 2, (corner[1] + topEnd[1]) / 2, innerZ]}
+            rotation={[0, 0, -Math.atan2(topEnd[0] - corner[0], topEnd[1] - corner[1])]}
+            castShadow
+          >
+            <capsuleGeometry args={[RAIL_R, Math.hypot(topEnd[0] - corner[0], topEnd[1] - corner[1]), 6, 16]} />
+            {metal}
+          </mesh>
+        </>
+      )}
     </group>
   )
 }

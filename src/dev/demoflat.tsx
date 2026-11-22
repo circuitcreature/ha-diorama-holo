@@ -25,7 +25,8 @@
 // `vacuum=1` has the robot vacuum say which room it cleans, with buttons
 // along the bottom to send it to a room or back to its dock.
 // `blueprint` draws the home in the blueprint style, and `blueprint=00e5ff`
-// in lines of that color. The living
+// in lines of that color. `objects=5a1f73` fills the furniture with that
+// solid color. The living
 // room is named by an alias of its area, Sala, as a robot's app would.
 // A click on a piece flips its entity, the way Home Assistant would. A cover
 // sent to a position runs there at a tenth of its travel every half second.
@@ -93,6 +94,8 @@ if (params.has('blueprint')) {
   config.style = 'blueprint'
   const color = params.get('blueprint')
   if (color) config.style_color = `#${color}`
+  const objects = params.get('objects')
+  if (objects) config.style_objects = `#${objects}`
 }
 if (params.has('all')) config.all_floors = true
 if (params.has('three')) {

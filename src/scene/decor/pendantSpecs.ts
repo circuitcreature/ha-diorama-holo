@@ -54,10 +54,33 @@ export const CIRIO_R = 0.05
 export const CIRIO_H = 0.21
 export const CIRIO_WALL = 0.003
 
+// Glass Orb: an opal sphere Ø30 on a short collar, hung from a slim rigid
+// rod rather than a cord. Not a lamp of any maker, so every number is a
+// plain one: the collar r by h, the rod's radius and the canopy Ø by h. The
+// rod runs from the collar up to the canopy, as long as the cord slider says.
+export const ORB_R = 0.15
+export const ORB_COLLAR: [number, number] = [0.028, 0.035]
+export const ORB_ROD_R = 0.005
+export const ORB_CANOPY: [number, number] = [0.1, 0.022]
+
+// Cone: a straight sided metal cone Ø30 at the rim and 26 cm tall, from a
+// collar Ø5 at its tip, open underneath and white inside. Not a lamp of any
+// maker, so every number is a plain one: the collar r by h, the wall, and
+// the canopy Ø by h.
+export const CONE_R = 0.15
+export const CONE_H = 0.26
+export const CONE_COLLAR: [number, number] = [0.025, 0.04]
+export const CONE_WALL = 0.004
+export const CONE_CANOPY: [number, number] = [0.1, 0.022]
+
 export const PENDANTS: Record<string, PendantSpec> = {
   nagoya: { diameter: NAGOYA_R * 2, glow: 0.09 },
   globo_cestita: { diameter: CESTITA_PENDANT_R * 2, glow: CESTITA_PENDANT_H / 2 },
   // Low in the bowl, far enough from the ceramic that its shadow holds.
   headhat_bowl: { diameter: HEADHAT_R * 2, glow: 0.065 },
   cirio_simple: { diameter: CIRIO_R * 2, glow: CAPSULE_H + CIRIO_H / 2 },
+  // In the middle of the sphere.
+  orb: { diameter: ORB_R * 2, glow: ORB_COLLAR[1] + ORB_R },
+  // High in the cone, so it lights the inside and throws a pool below.
+  cone: { diameter: CONE_R * 2, glow: CONE_COLLAR[1] + 0.06 },
 }
