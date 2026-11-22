@@ -9,6 +9,8 @@ moves that section under the new version and uses it as the release notes.
 
 ## [Unreleased]
 
+## [1.13.0] - 2026-11-22
+
 ### Added
 
 - Walls around every room, raised from the room outlines with their doors and windows cut out, at a height, thickness and color you choose. A porch or terrace can keep only the walls it shares with the house and stay open outside.
@@ -778,7 +780,8 @@ moves that section under the new version and uses it as the release notes.
 
 ### Changed
 
-[Unreleased]: https://github.com/circuitcreature/ha-diorama-holo/compare/v1.12.0...HEAD
+[Unreleased]: https://github.com/circuitcreature/ha-diorama-holo/compare/v1.13.0...HEAD
+[1.13.0]: https://github.com/circuitcreature/ha-diorama-holo/compare/v1.12.0...v1.13.0
 [1.12.0]: https://github.com/circuitcreature/ha-diorama-holo/compare/v1.11.1...v1.12.0
 [1.11.1]: https://github.com/CarlesRojas/ha-diorama/compare/v1.11.0...v1.11.1
 [1.11.0]: https://github.com/CarlesRojas/ha-diorama/compare/v1.10.0...v1.11.0
