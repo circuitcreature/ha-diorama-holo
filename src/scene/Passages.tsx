@@ -7,6 +7,7 @@ import { useEased } from '#/scene/decor/ease.ts'
 import { usePressActions } from '#/scene/decor/press.ts'
 import { floorColor } from '#/scene/floorColor.ts'
 import { HIDDEN_LAYER, PASSAGE } from '#/scene/focus.ts'
+import { useBlueprintMode } from '#/scene/blueprintMode.ts'
 import SurfaceMaterial from '#/scene/SurfaceMaterial.tsx'
 import {
   FLOOR_MATERIALS,
@@ -80,7 +81,9 @@ function Sign({ passage, room, index, onRoom }: SignProps) {
   const lean = useEased(over ? 1 : 0, 10)
   const [ox, oy] = passage.out
   const color = floorColor(room, index)
-  const floor = room.floor ? FLOOR_MATERIALS[room.floor.material] : undefined
+  // In the blueprint style the sign has no pattern, so none is baked.
+  const blueprint = useBlueprintMode()
+  const floor = room.floor && !blueprint ? FLOOR_MATERIALS[room.floor.material] : undefined
   const shaded = shade(color, lean * PASSAGE_HOVER_SHADE)
   return (
     <mesh

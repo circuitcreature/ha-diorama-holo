@@ -1,3 +1,4 @@
+import { useBlueprintMode } from '#/scene/blueprintMode.ts'
 import { useFrame } from '@react-three/fiber'
 import { throws, useThrown, type Throw } from '#/scene/decor/throw.ts'
 import { screenTint, showingTint } from '#/scene/decor/tint.ts'
@@ -267,8 +268,10 @@ export default function ScreenMaterial({
     }),
     [over],
   )
-  const cover = usePicture(showing?.art)
-  const logo = usePicture(showing?.logo?.src)
+  // In the blueprint style no picture is fetched or drawn.
+  const blueprint = useBlueprintMode()
+  const cover = usePicture(blueprint ? undefined : showing?.art)
+  const logo = usePicture(blueprint ? undefined : showing?.logo?.src)
   const art = useMemo(() => {
     if (!cover) return null
     const texture = new Texture(cover.image)

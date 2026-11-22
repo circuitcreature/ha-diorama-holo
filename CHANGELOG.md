@@ -9,6 +9,10 @@ moves that section under the new version and uses it as the release notes.
 
 ## [Unreleased]
 
+### Changed
+
+- The Blueprint style draws no textures at all: floors are plain, and screens, plugs and tablets show no pictures, so it loads faster.
+
 ## [1.13.0] - 2026-11-22
 
 ### Added

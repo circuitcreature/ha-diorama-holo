@@ -13,6 +13,7 @@ import { decorationKind, footprint, paramValue } from '#/decoration/catalog.ts'
 import { WALL_COLOR, WALL_HEIGHT_M, WALL_THICKNESS_M } from '#/theme.ts'
 import type { DecorationConfig, Point, RoomConfig, WallsConfig } from '#/types.ts'
 import { memo, useEffect, useMemo } from 'react'
+import { useBlueprintMode } from '#/scene/blueprintMode.ts'
 
 // Floors this close to touching are drawn as touching, in meters.
 const TOUCHING_GAP_M = 0.001
@@ -108,7 +109,9 @@ function Room({ room, rooms, index, radius, gap, occupied = false, walls = null,
   }, [room.id, room.points, room.floor_id, rooms, gap, storey, wallHeight, wallThickness, decorations, freeWalls])
   useEffect(() => () => wallShape?.dispose(), [wallShape])
 
-  const floor = room.floor ? FLOOR_MATERIALS[room.floor.material] : undefined
+  // In the blueprint style the floor has no pattern, so none is baked.
+  const blueprint = useBlueprintMode()
+  const floor = room.floor && !blueprint ? FLOOR_MATERIALS[room.floor.material] : undefined
   // The presence filter fades over the floor and away again.
   const shown = useEased(occupied ? 1 : 0, 4)
   const color = presenceTint(floorColor(room, index), room, shown)

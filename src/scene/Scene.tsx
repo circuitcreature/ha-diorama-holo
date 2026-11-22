@@ -11,6 +11,7 @@ import {
 import { cn } from '#/lib/utils.ts'
 import { BLUEPRINT_COLOR, ROOM_CORNER_RADIUS_M, ROOM_GAP_M } from '#/theme.ts'
 import Blueprint, { unmerged } from '#/scene/Blueprint.tsx'
+import { BlueprintMode } from '#/scene/blueprintMode.ts'
 import Adaptive from '#/scene/Adaptive.tsx'
 import Bvh from '#/scene/bvh.tsx'
 import CameraRig, { type CameraHandle } from '#/scene/CameraRig.tsx'
@@ -180,84 +181,86 @@ export default function Scene({
           })
         }
       >
-        <Sky hass={hass} rooms={rooms} mode={sky} direction={config.sun_direction} />
-        {/* Everything solid casts and receives, so a lamp throws the things
+        <BlueprintMode.Provider value={blueprint}>
+          <Sky hass={hass} rooms={rooms} mode={sky} direction={config.sun_direction} />
+          {/* Everything solid casts and receives, so a lamp throws the things
           around it onto the floor. */}
-        <Shadows />
-        <Cleanup />
-        <Adaptive />
-        <Bvh />
-        <Precompile watch={config} />
-        {fpsTicks && <FpsTicker ticks={fpsTicks} />}
-        <CameraRig
-          rooms={rooms}
-          decorations={config.decorations ?? []}
-          view={config.camera}
-          framed={config.frame_rooms}
-          focus={focus}
-          floor={floor}
-          handle={cameraRef}
-          onAway={onCameraAway}
-          wheelZoom={wheelZoom}
-        />
-        <Devices
-          hass={hass}
-          config={config}
-          onPick={onPickDecoration}
-          tries={tries}
-          onTry={onTry}
-          roomFirst={roomFirst}
-          // The editor picks a room from its floor, never from a door.
-          onRoom={onPickDecoration ? undefined : onPickRoom}
-          stairs={stairs}
-          onStairs={onPickDecoration ? undefined : onStairs}
-        />
-        {/* In the card, the pieces with no device behind them are drawn
+          <Shadows />
+          <Cleanup />
+          <Adaptive />
+          <Bvh />
+          <Precompile watch={config} />
+          {fpsTicks && <FpsTicker ticks={fpsTicks} />}
+          <CameraRig
+            rooms={rooms}
+            decorations={config.decorations ?? []}
+            view={config.camera}
+            framed={config.frame_rooms}
+            focus={focus}
+            floor={floor}
+            handle={cameraRef}
+            onAway={onCameraAway}
+            wheelZoom={wheelZoom}
+          />
+          <Devices
+            hass={hass}
+            config={config}
+            onPick={onPickDecoration}
+            tries={tries}
+            onTry={onTry}
+            roomFirst={roomFirst}
+            // The editor picks a room from its floor, never from a door.
+            onRoom={onPickDecoration ? undefined : onPickRoom}
+            stairs={stairs}
+            onStairs={onPickDecoration ? undefined : onStairs}
+          />
+          {/* In the card, the pieces with no device behind them are drawn
           together, a room at a time. In the editor every piece is its own,
           so it can be picked and tried. */}
-        {!onPickDecoration && !onTry && <Merged config={config} keep={keep} />}
-        {/* A press that misses everything looks around itself for something
+          {!onPickDecoration && !onTry && <Merged config={config} keep={keep} />}
+          {/* A press that misses everything looks around itself for something
           to act on, so small things are still easy to hit, and only then
           asks whether it landed on a room's floor. */}
-        <PickFallback onHandled={markFallback} onRoom={onPickRoom} />
-        {/* In the card, a focused room shows the way into a room open beside it. */}
-        {!onPickDecoration && onPickRoom && (
-          <Passages rooms={rooms} decorations={config.decorations ?? []} onRoom={onPickRoom} />
-        )}
-        {/* The frame is finished from a buffer: shaded where things meet,
+          <PickFallback onHandled={markFallback} onRoom={onPickRoom} />
+          {/* In the card, a focused room shows the way into a room open beside it. */}
+          {!onPickDecoration && onPickRoom && (
+            <Passages rooms={rooms} decorations={config.decorations ?? []} onRoom={onPickRoom} />
+          )}
+          {/* The frame is finished from a buffer: shaded where things meet,
           tone mapped, softly darkened at the corners, and in the editor with
           the picked thing outlined. */}
-        <Effects selected={selected} focus={focus} edgeFade={edgeFade} lines={blueprint ? lineColor : null} />
-        {blueprint && <Blueprint config={config} color={lineColor} />}
-        {rooms.map((room, i) => (
-          <Room
-            key={room.id}
-            room={room}
-            rooms={rooms}
-            index={i}
-            radius={radius}
-            gap={gap}
-            occupied={occupied(hass, room)}
-            walls={config.walls ?? null}
-            decorations={config.decorations}
-          />
-        ))}
-        {frame && (
-          <OrbitControls
-            makeDefault
-            domElement={frame}
-            enablePan
-            screenSpacePanning={false}
-            enableDamping
-            dampingFactor={0.1}
-            minPolarAngle={MathUtils.degToRad(CAMERA_MIN_POLAR_DEG)}
-            maxPolarAngle={MathUtils.degToRad(CAMERA_MAX_POLAR_DEG)}
-            minDistance={CAMERA_MIN_DISTANCE_M}
-            maxDistance={CAMERA_MAX_DISTANCE_M}
-          />
-        )}
-        {/* Last, so the home is all there by the time it looks. */}
-        <Opening focus={focus ?? null} onShown={show} />
+          <Effects selected={selected} focus={focus} edgeFade={edgeFade} lines={blueprint ? lineColor : null} />
+          {blueprint && <Blueprint config={config} color={lineColor} />}
+          {rooms.map((room, i) => (
+            <Room
+              key={room.id}
+              room={room}
+              rooms={rooms}
+              index={i}
+              radius={radius}
+              gap={gap}
+              occupied={occupied(hass, room)}
+              walls={config.walls ?? null}
+              decorations={config.decorations}
+            />
+          ))}
+          {frame && (
+            <OrbitControls
+              makeDefault
+              domElement={frame}
+              enablePan
+              screenSpacePanning={false}
+              enableDamping
+              dampingFactor={0.1}
+              minPolarAngle={MathUtils.degToRad(CAMERA_MIN_POLAR_DEG)}
+              maxPolarAngle={MathUtils.degToRad(CAMERA_MAX_POLAR_DEG)}
+              minDistance={CAMERA_MIN_DISTANCE_M}
+              maxDistance={CAMERA_MAX_DISTANCE_M}
+            />
+          )}
+          {/* Last, so the home is all there by the time it looks. */}
+          <Opening focus={focus ?? null} onShown={show} />
+        </BlueprintMode.Provider>
       </Canvas>
     </div>
   )

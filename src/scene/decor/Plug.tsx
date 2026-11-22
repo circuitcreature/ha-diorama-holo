@@ -1,3 +1,4 @@
+import { useBlueprintMode } from '#/scene/blueprintMode.ts'
 import { colorValue, decorationVariant, materialValue, paramValue, type DecorationKind } from '#/decoration/catalog.ts'
 import { useEased } from '#/scene/decor/ease.ts'
 import { Halo, Material, SEG, Slab, Tube } from '#/scene/decor/parts.tsx'
@@ -218,7 +219,10 @@ function PlugLead({ front, floor, M }: { front: number; floor: number; M: (slot:
 // What a meter plug's display says, drawn on a small canvas of its own
 // each time the words change, the last one let go of once it is replaced.
 function Readout({ text, color, lit, size }: { text: string; color: string; lit: number; size: [number, number] }) {
+  // In the blueprint style the display is lit plain, with no words drawn.
+  const blueprint = useBlueprintMode()
   const texture = useMemo(() => {
+    if (blueprint) return null
     const canvas = document.createElement('canvas')
     canvas.width = 192
     canvas.height = 96
@@ -236,8 +240,8 @@ function Readout({ text, color, lit, size }: { text: string; color: string; lit:
     map.colorSpace = SRGBColorSpace
     map.anisotropy = 8
     return map
-  }, [text, color])
-  useEffect(() => () => texture.dispose(), [texture])
+  }, [text, color, blueprint])
+  useEffect(() => () => texture?.dispose(), [texture])
   // The display stays faintly lit while the plug is off, as a meter does.
   const k = 0.3 + 0.7 * lit
   return (

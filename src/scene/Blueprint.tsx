@@ -7,8 +7,8 @@ import { Color, Mesh, MeshBasicMaterial, MeshStandardMaterial, type Material, ty
 
 // The blueprint style paints the home as dark glass, with its edges traced
 // in one color by the frame's last pass, see blueprintEdges.ts. Here every
-// face gets its fill: a deep shade of the line color that keeps the pattern
-// it had, so a tiled floor still shows its tiles. With an object color set,
+// face gets its fill: a deep shade of the line color, plain, with no
+// pattern or picture on it, see blueprintMode.ts. With an object color set,
 // the furniture and everything else placed in the rooms is filled with it,
 // solid, while the floors, walls, doors, windows and stairs stay glass.
 // The signs on the floor that lead to the room beside are solid and unlit,
@@ -105,7 +105,7 @@ function makeLook(color: string, objects: string | undefined, arrows: string | u
 }
 
 // A fill for each paint, made once and shared by every mesh in that paint.
-// Glass keeps the paint's pattern, darkened; a solid fill is the color alone.
+// Either is the color alone, with no pattern.
 function fillFor(look: Look, source: Material, solid: string | null) {
   let cache = solid ? look.solids.get(solid) : look.fills
   if (!cache) {
@@ -119,14 +119,14 @@ function fillFor(look: Look, source: Material, solid: string | null) {
       color: solid ?? look.glass,
       roughness: FILL_ROUGHNESS,
       metalness: 0,
-      map: solid ? null : (s.map ?? null),
-      normalMap: solid ? null : (s.normalMap ?? null),
+      // No pictures: the style is lines and flat color.
+      map: null,
+      normalMap: null,
       side: s.side,
       transparent: s.transparent,
       opacity: s.transparent ? Math.min(s.opacity, 0.6) : 1,
       alphaTest: s.alphaTest,
     })
-    if (!solid && s.normalScale) found.normalScale.copy(s.normalScale)
     cache.set(source, found)
   }
   return found

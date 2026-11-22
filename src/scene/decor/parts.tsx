@@ -1,3 +1,4 @@
+import { useBlueprintMode } from '#/scene/blueprintMode.ts'
 import { roundedShape } from '#/geometry/polygon.ts'
 import { surfaceRoughness, type SurfaceKind } from '#/materials/textures.ts'
 import { useEased } from '#/scene/decor/ease.ts'
@@ -854,9 +855,11 @@ export function Draft({
   speed?: number
   color?: string
 }) {
-  const lit = useEased(on ? 1 : 0, 3)
+  // In the blueprint style a draft shows no specks, which are pictures.
+  const blueprint = useBlueprintMode()
+  const lit = useEased(on && !blueprint ? 1 : 0, 3)
   const specks = useRef<(Sprite | null)[]>([])
-  const motes = useMemo(() => scatterMotes(count), [count])
+  const motes = useMemo(() => scatterMotes(blueprint ? 0 : count), [count, blueprint])
   useLive(lit >= 0.01)
   useFrame(({ clock }) => {
     if (lit < 0.01) {

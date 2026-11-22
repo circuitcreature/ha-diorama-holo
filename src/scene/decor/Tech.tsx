@@ -1,3 +1,4 @@
+import { useBlueprintMode } from '#/scene/blueprintMode.ts'
 import { colorValue, decorationVariant, materialValue, paramValue, type DecorationKind } from '#/decoration/catalog.ts'
 import { useEased } from '#/scene/decor/ease.ts'
 import { Glass, Halo, Material, SEG, Slab } from '#/scene/decor/parts.tsx'
@@ -457,7 +458,9 @@ function WallTablet({ p, c, M, style, state, on }: Look) {
   const depth = portrait ? 0.008 : 0.007
   const lit = useEased(on ? 1 : 0, 6)
   const showing = state?.showing
-  const page = useMemo(() => dashboard(portrait), [portrait])
+  // In the blueprint style the screen is lit plain, with no page drawn.
+  const blueprint = useBlueprintMode()
+  const page = useMemo(() => (blueprint ? null : dashboard(portrait)), [portrait, blueprint])
   return (
     <group>
       {portrait ? (
