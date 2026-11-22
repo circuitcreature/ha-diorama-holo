@@ -9,6 +9,8 @@ moves that section under the new version and uses it as the release notes.
 
 ## [Unreleased]
 
+## [1.12.0] - 2026-11-22
+
 ### Added
 
 - A Blueprint style in the card's settings draws the home as glowing lines over dark glass, in a color of your choice.
@@ -763,7 +765,8 @@ moves that section under the new version and uses it as the release notes.
 
 ### Changed
 
-[Unreleased]: https://github.com/circuitcreature/ha-diorama-holo/compare/v1.11.1...HEAD
+[Unreleased]: https://github.com/circuitcreature/ha-diorama-holo/compare/v1.12.0...HEAD
+[1.12.0]: https://github.com/circuitcreature/ha-diorama-holo/compare/v1.11.1...v1.12.0
 [1.11.1]: https://github.com/CarlesRojas/ha-diorama/compare/v1.11.0...v1.11.1
 [1.11.0]: https://github.com/CarlesRojas/ha-diorama/compare/v1.10.0...v1.11.0
 [1.10.0]: https://github.com/CarlesRojas/ha-diorama/compare/v1.9.0...v1.10.0
