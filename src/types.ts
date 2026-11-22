@@ -130,6 +130,10 @@ export type RoomConfig = {
   // The card each entity's tile is, by entity id, in place of the one the
   // side panel picks for its domain.
   tiles?: TileChoices
+  // Which of the card's walls the room has: all of them when absent, only
+  // where it meets another room with `shared`, for a porch or a terrace
+  // open on its other sides, or none.
+  walls?: 'shared' | 'none'
   // Rooms open beside this one whose sign on the floor is left out of this
   // room's view, as room ids.
   hide_arrows?: string[]
@@ -303,6 +307,10 @@ export type CardConfig = {
   // follows the ones it does, in the plan's order.
   room_order?: string[]
   background?: BackgroundConfig
+  // Walls raised along every room's outline, with doors and windows cut out
+  // of them, `height` tall and `thickness` thick in meters, in `color`.
+  // None when absent.
+  walls?: WallsConfig
   // How the home is drawn. `blueprint` traces every edge in `style_color`
   // over faces filled with a deep shade of it. Solid, as built, when absent.
   style?: 'blueprint'
@@ -318,6 +326,14 @@ export type CardConfig = {
   // Sizes of the side panel's layout for each screen it is seen on, by the
   // id the screen gave itself. Set from the card's settings on that screen.
   screens?: Record<string, ScreenConfig>
+}
+
+// The walls along the rooms' outlines. Each value is the default when left
+// out: up to the ceiling, ten centimeters thick and off white.
+export type WallsConfig = {
+  height?: number
+  thickness?: number
+  color?: string
 }
 
 // One screen's sizes. Without them the diorama takes two thirds of the

@@ -238,6 +238,8 @@ export default function Scene({
             radius={radius}
             gap={gap}
             occupied={occupied(hass, room)}
+            walls={config.walls ?? null}
+            decorations={config.decorations}
           />
         ))}
         {frame && (

@@ -38,6 +38,9 @@ type Props = {
   onFloor: (roomId: string, floor: RoomConfig['floor']) => void
   // Raises or lowers the room's floor, in meters, `undefined` for level.
   onElevation: (roomId: string, elevation: number | undefined) => void
+  // Which of the card's walls the room has, only asked while it has walls.
+  hasWalls?: boolean
+  onWalls?: (roomId: string, walls: RoomConfig['walls']) => void
   // The sensor that says someone is in the room, and the filter over its
   // floor while it does.
   hass: HomeAssistant | null
@@ -76,6 +79,8 @@ export default function RoomInfo({
   onAssignArea,
   onFloor,
   onElevation,
+  hasWalls = false,
+  onWalls,
   hass,
   onPresence,
   decorations,
@@ -195,6 +200,29 @@ export default function RoomInfo({
           <ResetButton label="Elevation" changed={elevation !== 0} onReset={() => onElevation(room.id, undefined)} />
         </label>
       </div>
+      {hasWalls && onWalls && (
+        <div className={group}>
+          <label className={cn(row, 'grid-cols-[96px_1fr_24px]')}>
+            Walls
+            <Select
+              aria-label="Walls"
+              value={room.walls ?? 'all'}
+              options={[
+                { value: 'all', label: 'All round' },
+                { value: 'shared', label: 'Only shared, open outside' },
+                { value: 'none', label: 'None' },
+              ]}
+              onChange={v => onWalls(room.id, v === 'shared' || v === 'none' ? v : undefined)}
+            />
+            <ResetButton label="Walls" changed={room.walls !== undefined} onReset={() => onWalls(room.id, undefined)} />
+          </label>
+          {room.walls === 'shared' && (
+            <p className={note}>
+              Only the walls it shares with the rooms beside it, as a porch or a terrace has. Its outer sides stay open.
+            </p>
+          )}
+        </div>
+      )}
       <div className={group}>
         <label className={cn(row, 'grid-cols-[96px_1fr_24px]')}>
           Floor

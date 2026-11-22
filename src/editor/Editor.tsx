@@ -767,6 +767,16 @@ export default function Editor({ hass, config, onChange, onSave }: Props) {
       }),
     )
 
+  // Which of the card's walls a room has, all of them when left out.
+  const setRoomWalls = (roomId: string, walls: RoomConfig['walls']) =>
+    commit(
+      rooms.map(r => {
+        if (r.id !== roomId) return r
+        const { walls: _dropped, ...rest } = r
+        return walls ? { ...rest, walls } : rest
+      }),
+    )
+
   // Sets the sensor that says someone is in a room and the filter laid over
   // its floor while it does, or takes it away.
   const setPresence = (roomId: string, presence: RoomConfig['presence']) =>
@@ -1327,6 +1337,8 @@ export default function Editor({ hass, config, onChange, onSave }: Props) {
         onAssignArea={assignArea}
         onFloor={setFloor}
         onElevation={setElevation}
+        hasWalls={!!config.walls}
+        onWalls={setRoomWalls}
         floors={multi ? levels : undefined}
         onAssignFloor={moveToFloor}
         hass={hass}

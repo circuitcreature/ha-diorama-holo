@@ -26,7 +26,8 @@
 // along the bottom to send it to a room or back to its dock.
 // `blueprint` draws the home in the blueprint style, and `blueprint=00e5ff`
 // in lines of that color. `objects=5a1f73` fills the furniture with that
-// solid color. The living
+// solid color. `walls` raises walls along every room, and `walls=1.2` that
+// tall. The living
 // room is named by an alias of its area, Sala, as a robot's app would.
 // A click on a piece flips its entity, the way Home Assistant would. A cover
 // sent to a position runs there at a tenth of its travel every half second.
@@ -90,6 +91,10 @@ if (mobile) {
 const frame = params.get('frame')
 if (frame) config.frame_rooms = frame.split(',')
 if (params.get('first') === 'device') config.first_click = 'device'
+if (params.has('walls')) {
+  const height = Number(params.get('walls'))
+  config.walls = height > 0 ? { height } : {}
+}
 if (params.has('blueprint')) {
   config.style = 'blueprint'
   const color = params.get('blueprint')

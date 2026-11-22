@@ -11,6 +11,7 @@ moves that section under the new version and uses it as the release notes.
 
 ### Added
 
+- Walls around every room, raised from the room outlines with their doors and windows cut out, at a height, thickness and color you choose. A porch or terrace can keep only the walls it shares with the house and stay open outside.
 - The Blueprint style can fill the furniture with a solid color of its own, with the walls, doors and windows left as glass, any piece can have a line and fill color of its own over the card's, and the arrows to the next room are solid in a color you can pick.
 - Two new pendant styles: a Glass Orb, an opal sphere on a rigid rod whose length you set, and a Metal Cone, black outside and lit white inside.
 - An Ottoman in each of the sofa's three styles, with its own width, depth and height.

@@ -9,7 +9,14 @@ import { colorWell, field, group, groupTitle, note } from '#/editor/look.ts'
 import ControlsGuide from '#/editor/ControlsGuide.tsx'
 import { ResetButton, Slider, Switch } from '#/editor/panel.tsx'
 import { SUN_DIRECTION_DEG } from '#/constants.ts'
-import { BLUEPRINT_COLOR, BLUEPRINT_OBJECTS_COLOR, EDITOR_TINT_COLOR } from '#/theme.ts'
+import {
+  BLUEPRINT_COLOR,
+  BLUEPRINT_OBJECTS_COLOR,
+  EDITOR_TINT_COLOR,
+  WALL_COLOR,
+  WALL_HEIGHT_M,
+  WALL_THICKNESS_M,
+} from '#/theme.ts'
 import { entityName } from '#/devices/catalog.ts'
 import type {
   BackgroundConfig,
@@ -19,6 +26,7 @@ import type {
   RoomConfig,
   TileChoice,
   TileChoices,
+  WallsConfig,
 } from '#/types.ts'
 import {
   autoTiles,
@@ -132,6 +140,19 @@ export default function CardPanel({ hass, config, onChange, opening, onOpen }: P
   const setObjectsColor = (color: string | null) => {
     const { style_objects: _, ...rest } = config
     onChange(color ? { ...rest, style_objects: color } : rest)
+  }
+
+  // The walls along the rooms' outlines, on while the card has any setting
+  // for them. A setting at its default is left out of the YAML, and turning
+  // the walls off forgets them.
+  const walls = config.walls
+  const setWalls = (next: WallsConfig | null) => {
+    const { walls: _, ...rest } = config
+    onChange(next ? { ...rest, walls: next } : rest)
+  }
+  const setWall = <K extends keyof WallsConfig>(key: K, value: WallsConfig[K], fallback: WallsConfig[K]) => {
+    const { [key]: _, ...rest } = walls ?? {}
+    setWalls(value === fallback ? rest : { ...rest, [key]: value })
   }
 
   // Which way the sun comes from, left out of the YAML at its default.
@@ -714,6 +735,74 @@ export default function CardPanel({ hass, config, onChange, opening, onOpen }: P
                 value={config.style_objects}
                 onChange={e => setObjectsColor(e.target.value)}
               />
+            </label>
+          )}
+        </div>
+      </Section>
+
+      <Section title="Walls">
+        <div className={cn(group, 'gap-0 py-0')}>
+          <label className="flex cursor-pointer items-center justify-between gap-4 py-2.5">
+            <span className="flex min-w-0 flex-col">
+              <span className="text-[13px]">Walls around every room</span>
+              <span className="text-label-2 text-xs">
+                Raised along each room's outline, with its doors and windows cut out of them.
+              </span>
+            </span>
+            <Switch
+              checked={!!walls}
+              accent={EDITOR_TINT_COLOR}
+              label="Walls around every room"
+              onChange={on => setWalls(on ? {} : null)}
+            />
+          </label>
+          {walls &&
+            (
+              [
+                ['height', 'Height', WALL_HEIGHT_M, 0.3, 3, 0.05],
+                ['thickness', 'Thickness', WALL_THICKNESS_M, 0.04, 0.4, 0.01],
+              ] as const
+            ).map(([key, label, fallback, min, max, step]) => {
+              const value = walls[key] ?? fallback
+              return (
+                <div key={key} className="border-separator flex flex-col gap-2 border-t py-3">
+                  <div className="flex items-center gap-2">
+                    <span className="flex-1 text-[13px]">{label}</span>
+                    <span className="text-label-2 text-xs tabular-nums">{value.toFixed(2)} m</span>
+                    <ResetButton
+                      label={`Wall ${label.toLowerCase()}`}
+                      changed={walls[key] !== undefined}
+                      onReset={() => setWall(key, fallback, fallback)}
+                    />
+                  </div>
+                  <Slider
+                    aria-label={`Wall ${label.toLowerCase()}`}
+                    className="w-full"
+                    min={min}
+                    max={max}
+                    step={step}
+                    value={value}
+                    onChange={e => setWall(key, Number(e.target.value), fallback)}
+                  />
+                </div>
+              )
+            })}
+          {walls && (
+            <label className="border-separator flex cursor-pointer items-center justify-between gap-4 border-t py-2.5">
+              <span className="text-[13px]">Color</span>
+              <span className="flex items-center gap-2">
+                <input
+                  type="color"
+                  className={colorWell}
+                  value={walls.color ?? WALL_COLOR}
+                  onChange={e => setWall('color', e.target.value, WALL_COLOR)}
+                />
+                <ResetButton
+                  label="Wall color"
+                  changed={walls.color !== undefined}
+                  onReset={() => setWall('color', WALL_COLOR, WALL_COLOR)}
+                />
+              </span>
             </label>
           )}
         </div>

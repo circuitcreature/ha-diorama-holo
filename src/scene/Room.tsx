@@ -8,8 +8,11 @@ import { presenceTint } from '#/scene/presence.ts'
 import { ensureCounterClockwise, inset, roundedShape } from '#/geometry/polygon.ts'
 import { elevationOf } from '#/geometry/elevation.ts'
 import { slabGeometry, touchesNeighbour } from '#/geometry/slab.ts'
-import type { Point, RoomConfig } from '#/types.ts'
-import { memo, useMemo } from 'react'
+import { wallGeometry, type OpeningPiece } from '#/geometry/walls.ts'
+import { decorationKind, footprint, paramValue } from '#/decoration/catalog.ts'
+import { WALL_COLOR, WALL_HEIGHT_M, WALL_THICKNESS_M } from '#/theme.ts'
+import type { DecorationConfig, Point, RoomConfig, WallsConfig } from '#/types.ts'
+import { memo, useEffect, useMemo } from 'react'
 
 // Floors this close to touching are drawn as touching, in meters.
 const TOUCHING_GAP_M = 0.001
@@ -23,11 +26,35 @@ type Props = {
   gap: number
   // Someone is in the room, by its presence sensor.
   occupied?: boolean
+  // The card's walls, when it has them, and the pieces whose doors and
+  // windows cut openings in them.
+  walls?: WallsConfig | null
+  decorations?: DecorationConfig[]
+}
+
+// The pieces that cut an opening in a wall, and how high up it starts.
+const OPENING_KINDS = new Set(['door', 'sliding_door', 'garage_door', 'window'])
+
+function openingPieces(decorations: DecorationConfig[], onFloor: (room: string) => boolean): OpeningPiece[] {
+  const found: OpeningPiece[] = []
+  for (const item of decorations) {
+    if (!OPENING_KINDS.has(item.kind) || !onFloor(item.room)) continue
+    const kind = decorationKind(item.kind)
+    if (!kind) continue
+    const bottom = item.kind === 'window' ? paramValue(kind, item.params, 'sill', item.variant) : 0
+    found.push({
+      position: item.position,
+      width: footprint(kind, item.params, item.variant)[0],
+      bottom,
+      top: bottom + paramValue(kind, item.params, 'height', item.variant),
+    })
+  }
+  return found
 }
 
 // Clicks on the floor are not taken here. The press fallback finds the room
 // under a press once the pieces around it have had their turn.
-function Room({ room, rooms, index, radius, gap, occupied = false }: Props) {
+function Room({ room, rooms, index, radius, gap, occupied = false, walls = null, decorations = [] }: Props) {
   const elevation = elevationOf(room)
   // With every floor in view, a floor reaches down only as far as the
   // lowest room of its own floor, and leaves the floor below in sight.
@@ -43,9 +70,9 @@ function Room({ room, rooms, index, radius, gap, occupied = false }: Props) {
     const neighbours =
       gap > TOUCHING_GAP_M
         ? []
-        : rooms.filter(
-            other => other.id !== room.id && (other.storey ?? 0) === storey && elevationOf(other) >= elevation,
-          ).map(r => r.points)
+        : rooms
+            .filter(other => other.id !== room.id && (other.storey ?? 0) === storey && elevationOf(other) >= elevation)
+            .map(r => r.points)
     // A concave corner wraps around a neighbour's convex corner. For the two
     // arcs to be concentric its radius grows by the gap.
     const outline = roundedShape(points, cornerRadius, cornerRadius + gap, i => touchesNeighbour(points[i], neighbours))
@@ -62,6 +89,24 @@ function Room({ room, rooms, index, radius, gap, occupied = false }: Props) {
       FLOOR_PATTERN_SHIFT_M,
     )
   }, [room.id, room.points, room.radius, rooms, radius, gap, elevation, lowest, storey])
+
+  // The walls along the outline, each room building its own half of a wall
+  // it shares, see walls.ts.
+  const wallHeight = walls && room.walls !== 'none' ? (walls.height ?? WALL_HEIGHT_M) : 0
+  const freeWalls = room.walls !== 'shared'
+  const wallThickness = walls?.thickness ?? WALL_THICKNESS_M
+  const wallShape = useMemo(() => {
+    if (!wallHeight) return null
+    const sameFloor = (other: RoomConfig) =>
+      (other.storey ?? 0) === storey && (other.floor_id ?? '') === (room.floor_id ?? '')
+    const outline = inset(ensureCounterClockwise(room.points), gap / 2)
+    const beside = rooms.filter(other => other.id !== room.id && sameFloor(other))
+    const neighbours = beside.map(other => inset(ensureCounterClockwise(other.points), gap / 2))
+    const floorRooms = new Set([room.id, ...beside.map(other => other.id)])
+    const pieces = openingPieces(decorations, id => floorRooms.has(id))
+    return wallGeometry(outline, neighbours, wallHeight, wallThickness, pieces, freeWalls)
+  }, [room.id, room.points, room.floor_id, rooms, gap, storey, wallHeight, wallThickness, decorations, freeWalls])
+  useEffect(() => () => wallShape?.dispose(), [wallShape])
 
   const floor = room.floor ? FLOOR_MATERIALS[room.floor.material] : undefined
   // The presence filter fades over the floor and away again.
@@ -89,6 +134,12 @@ function Room({ room, rooms, index, radius, gap, occupied = false }: Props) {
         />
       ) : (
         <meshStandardMaterial color={color} roughness={0.85} />
+      )}
+      {/* A part of the room, so it shows, hides and is pressed with it. */}
+      {wallShape && (
+        <mesh name={`walls:${room.id}`} geometry={wallShape} castShadow receiveShadow userData={{ room: room.id }}>
+          <meshStandardMaterial color={walls?.color ?? WALL_COLOR} roughness={0.9} />
+        </mesh>
       )}
     </mesh>
   )

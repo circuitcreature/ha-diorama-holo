@@ -66,6 +66,11 @@ export const EDITOR_BOUND_COLOR = '#ff9f0a'
 
 // Height of the ceiling that pendants and ceiling lights hang from.
 export const CEILING_HEIGHT_M = 2.6
+// The walls raised along every room's outline when the card has them on:
+// up to the ceiling, ten centimeters thick, and off white.
+export const WALL_HEIGHT_M = CEILING_HEIGHT_M
+export const WALL_THICKNESS_M = 0.1
+export const WALL_COLOR = '#f3f1ec'
 // Default colors of the material slots of the light family.
 // The Scandinavian palette every model draws from: pale woods, chalky
 // whites, muted greens and clays, soft greys.

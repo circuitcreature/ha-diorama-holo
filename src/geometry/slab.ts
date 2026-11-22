@@ -24,7 +24,7 @@ export function touchesNeighbour(p: Point, neighbours: Point[][]) {
 // The outline with its edges cut wherever a corner of a neighbour lands on
 // them, so every stretch either runs along a neighbour from end to end or
 // not at all.
-function cutAtNeighbours(outline: Point[], neighbours: Point[][]): Point[] {
+export function cutAtNeighbours(outline: Point[], neighbours: Point[][]): Point[] {
   const result: Point[] = []
   for (let i = 0; i < outline.length; i++) {
     const a = outline[i]
